@@ -10,8 +10,6 @@ import sendMail from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { v2 as cloudinary } from "cloudinary";
 import bcrypt from "bcryptjs";
-import { redis } from '../utils/redis';
-import { getAllUsersService, getUserByIdService, updateUserRoleService, deleteUserService } from '../services/user.service';
 import { createActivationToken, validateEmail, hashPassword, comparePassword, generateAccessToken, generateRefreshToken } from '../utils/auth';
 import { sequelize } from '../utils/database';
 
@@ -47,7 +45,8 @@ export const registerUser = catchAsyncError(
         avatar: avatar || {
           public_id: 'default_avatar',
           url: 'https://res.cloudinary.com/demo/image/upload/v1/default_avatar'
-        }
+        },
+        role: ""
       });
 
       // Create activation token
@@ -88,22 +87,6 @@ interface IActivationToken {
   activationCode: string;
 }
 
-export const createActivationToken = (user: any): IActivationToken => {
-  const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
-
-  const token = jwt.sign(
-    {
-      user,
-      activationCode,
-    },
-    process.env.ACTIVATION_SECRET as Secret,
-    {
-      expiresIn: "5m",
-    }
-  );
-
-  return { token, activationCode };
-};
 
 // activate user
 interface IActivationRequest {
@@ -369,7 +352,10 @@ export const updateProfilePicture = catchAsyncError(
         return next(new ErrorHandler('User not found', 404));
       }
 
-      user.avatar = avatar;
+      user.avatar = {
+        public_id: `custom_avatar_${user.id}`,
+        url: avatar
+      };
       await user.save();
 
       res.status(200).json({
@@ -501,8 +487,13 @@ export const socialAuth = catchAsyncError(
         const newUser = await User.create({
           email,
           name,
-          avatar,
-          isVerified: true
+          avatar: {
+            public_id: `social_avatar_${email}`,
+            url: avatar
+          },
+          isVerified: true,
+          password: "",
+          role: ""
         });
 
         const accessToken = generateAccessToken(newUser);

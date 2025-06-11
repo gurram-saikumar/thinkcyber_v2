@@ -22,7 +22,7 @@ export const sendToken = (user: any, statusCode: number, res: any) => {
 
 export const isAuthenticated = catchAsyncError(
   async (req: Request, res: any, next: any) => {
-    const { token } = req.cookies;
+    const token = req.cookies['access_token'];
 
     if (!token) {
       return next(new ErrorHandler("Please login to access this resource", 401));
