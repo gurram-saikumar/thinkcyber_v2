@@ -2,7 +2,7 @@ import {v2 as cloudinary} from "cloudinary";
 import http from "http";
 import { connectDB } from "./utils/database";
 import { initSocketServer } from "./socketServer";
-import { app, server } from "./app";
+import { app } from "./app";
 import dotenv from 'dotenv';
 
 // Load environment variables

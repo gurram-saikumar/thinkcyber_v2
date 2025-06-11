@@ -1,12 +1,13 @@
+import React from "react";
 import {
   View,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
   FlatList,
   Text,
   Image,
 } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { useFonts, Nunito_700Bold } from "@expo-google-fonts/nunito";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
@@ -114,7 +115,7 @@ export default function SearchInput({ homeScreen }: { homeScreen?: boolean }) {
           renderItem={
             homeScreen
               ? renderCourseItem
-              : ({ item }) => <CourseCard item={item} key={item._id} />
+              : ({ item }: { item: CoursesType }) => <CourseCard item={item} key={item._id} />
           }
         />
       </View>

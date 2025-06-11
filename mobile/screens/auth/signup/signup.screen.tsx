@@ -5,9 +5,9 @@ import {
   Image,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
+import { TouchableOpacity } from "react-native";
 import {
   AntDesign,
   Entypo,
@@ -97,13 +97,20 @@ export default function SignUpScreen() {
   };
 
   const handleSignIn = async () => {
+    // Prevent API call if there is a password error
+    if (error.password) {
+      Toast.show(error.password, { type: "danger" });
+      return;
+    }
     setButtonSpinner(true);
+    const requestData = {
+      name: userInfo.name,
+      email: userInfo.email,
+      password: userInfo.password,
+    };
+    console.log('[SIGNUP REQUEST]', `${SERVER_URI}/registration`, requestData);
     await axios
-      .post(`${SERVER_URI}/registration`, {
-        name: userInfo.name,
-        email: userInfo.email,
-        password: userInfo.password,
-      })
+      .post(`${SERVER_URI}/registration`, requestData)
       .then(async (res) => {
         await AsyncStorage.setItem(
           "activation_token",
@@ -122,9 +129,17 @@ export default function SignUpScreen() {
       })
       .catch((error) => {
         setButtonSpinner(false);
-        Toast.show("Email already exist!", {
-          type: "danger",
-        });
+        if (error.response) {
+          console.log('[SIGNUP ERROR]', error.message, error.response.data);
+          Toast.show(error.response.data?.message || "Registration failed!", {
+            type: "danger",
+          });
+        } else {
+          console.log('[SIGNUP ERROR]', error.message);
+          Toast.show("Network or server error!", {
+            type: "danger",
+          });
+        }
       });
   };
 
@@ -151,7 +166,7 @@ export default function SignUpScreen() {
               keyboardType="default"
               value={userInfo.name}
               placeholder="shahriar sajeeb"
-              onChangeText={(value) =>
+              onChangeText={(value: any) =>
                 setUserInfo({ ...userInfo, name: value })
               }
             />
@@ -168,7 +183,7 @@ export default function SignUpScreen() {
               keyboardType="email-address"
               value={userInfo.email}
               placeholder="support@becodemy.com"
-              onChangeText={(value) =>
+              onChangeText={(value: any) =>
                 setUserInfo({ ...userInfo, email: value })
               }
             />

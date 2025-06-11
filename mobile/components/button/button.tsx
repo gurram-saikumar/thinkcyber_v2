@@ -1,11 +1,5 @@
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
 import React from "react";
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { commonStyles } from "@/styles/common/common.styles";
 
 export default function Button({

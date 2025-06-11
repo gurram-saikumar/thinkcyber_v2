@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
@@ -53,7 +53,7 @@ app.use(fileUpload({
 }));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: true,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: [
@@ -98,6 +98,12 @@ app.get("/test", (req: Request, res: Response) => {
 
 // Error handling
 app.use(ErrorMiddleware);
+
+const PORT = Number(process.env.PORT) || 5000;
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 export { app, server };
 
