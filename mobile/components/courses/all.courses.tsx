@@ -48,42 +48,52 @@ export default function AllCourses() {
   }
 
   return (
-    <View style={{ flex: 1, marginHorizontal: 16 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text
+    <FlatList
+      ref={flatListRef}
+      data={courses}
+      keyExtractor={(item, idx) =>
+        item?._id ? item._id.toString() : idx.toString()
+      }
+      renderItem={({ item }) => <CourseCard item={item} />}
+      ListHeaderComponent={
+        <View
           style={{
-            fontSize: 20,
-            color: "#000000",
-            fontFamily: "Raleway_700Bold",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginHorizontal: 16,
+            marginBottom: 8,
           }}
         >
-          Popular courses
-        </Text>
-        <TouchableOpacity onPress={() => router.push("/(tabs)/courses")}>
           <Text
             style={{
-              fontSize: 15,
-              color: "#2467EC",
-              fontFamily: "Nunito_600SemiBold",
+              fontSize: 20,
+              color: "#000000",
+              fontFamily: "Raleway_700Bold",
             }}
           >
-            See All
+            Popular courses
           </Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        ref={flatListRef}
-        data={courses}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={({ item }) => <CourseCard item={item} />}
-      />
-    </View>
+          <TouchableOpacity onPress={() => router.push("/(tabs)/courses")}>
+            <Text
+              style={{
+                fontSize: 15,
+                color: "#2467EC",
+                fontFamily: "Nunito_600SemiBold",
+              }}
+            >
+              See All
+            </Text>
+          </TouchableOpacity>
+        </View>
+      }
+      ListEmptyComponent={
+        <Text style={{ textAlign: "center", marginTop: 32 }}>
+          {loading ? "Loading..." : "No courses found."}
+        </Text>
+      }
+      contentContainerStyle={{ paddingBottom: 16 }}
+      showsVerticalScrollIndicator={false}
+    />
   );
 }

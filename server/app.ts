@@ -101,8 +101,8 @@ app.use(ErrorMiddleware);
 
 const PORT = Number(process.env.PORT) || 5000;
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on port ${PORT}`);
+server.listen(8000, '0.0.0.0', () => {
+  console.log(`Server is running on port`);
 });
 
 export { app, server };

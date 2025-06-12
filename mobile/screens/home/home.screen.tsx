@@ -13,10 +13,10 @@ export default function HomeScreen() {
     >
       <Header />
       <SearchInput homeScreen={true} />
-      <ScrollView showsVerticalScrollIndicator={false}>
+
         <HomeBannerSlider />
         <AllCourses />
-      </ScrollView>
+
     </LinearGradient>
   );
 }

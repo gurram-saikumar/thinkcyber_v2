@@ -42,7 +42,7 @@ export async function generateLast12MothsData<T extends Model>(
             [Op.gte]: startDate,
             [Op.lt]: endDate,
           },
-        },
+        } as any,
       });
 
       last12Months.push({ month: monthYear, count });
