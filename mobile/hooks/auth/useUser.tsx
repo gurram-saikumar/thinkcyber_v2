@@ -12,13 +12,13 @@ export default function useUser() {
   useEffect(() => {
     const subscription = async () => {
       const accessToken = await AsyncStorage.getItem("access_token");
-      const refreshToken = await AsyncStorage.getItem("refresh_token");
+      // const refreshToken = await AsyncStorage.getItem("refresh_token");
 
       await axios
         .get(`${SERVER_URI}/me`, {
           headers: {
-            "access-token": accessToken,
-            "refresh-token": refreshToken,
+            Authorization: `Bearer ${accessToken}`,
+            // "refresh-token": refreshToken, // only if your backend uses this
           },
         })
         .then((res: any) => {

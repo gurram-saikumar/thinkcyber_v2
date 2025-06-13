@@ -13,30 +13,35 @@ import {
   Image,
   RefreshControl,
 } from "react-native";
+import { useStripe } from "@stripe/stripe-react-native";
 import { handlePayment } from "@/utils/stripe";
 
 export default function CartScreen() {
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [cartItems, setCartItems] = useState<CoursesType[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
   useEffect(() => {
-    const subscription = async () => {
-      const cart: any = await AsyncStorage.getItem("cart");
-      setCartItems(JSON.parse(cart));
+    const loadCart = async () => {
+      const cart = await AsyncStorage.getItem("cart");
+      setCartItems(cart ? JSON.parse(cart) : []);
     };
-    subscription();
+    loadCart();
   }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    const cart: any = await AsyncStorage.getItem("cart");
-    setCartItems(cart);
+    const cart = await AsyncStorage.getItem("cart");
+    setCartItems(cart ? JSON.parse(cart) : []);
     setRefreshing(false);
   };
 
   const calculateTotalPrice = () => {
-    const totalPrice = cartItems.reduce((total, item) => total + item.price, 0);
+    const totalPrice = cartItems.reduce((total, item) => {
+      const price = Number(item.price);
+      return total + (isNaN(price) ? 0 : price);
+    }, 0);
     return totalPrice.toFixed(2);
   };
 
@@ -55,7 +60,7 @@ export default function CartScreen() {
     setCartItems(updatedCartData);
   };
 
-  const handlePayment = async () => {
+  const handlePaymentPress = async () => {
     try {
       const amount = Math.round(
         cartItems.reduce((total, item) => total + item.price, 0) * 100
@@ -68,7 +73,8 @@ export default function CartScreen() {
         },
         (error) => {
           console.error(error);
-        }
+        },
+        { initPaymentSheet, presentPaymentSheet } // pass these for mobile
       );
     } catch (error) {
       console.error(error);
@@ -83,7 +89,7 @@ export default function CartScreen() {
       .post(
         `${SERVER_URI}/create-mobile-order`,
         {
-          courseId: cartItems[0]._id,
+          courseId: cartItems[0]?._id,
           payment_info: paymentResponse,
         },
         {
@@ -136,7 +142,7 @@ export default function CartScreen() {
             </Text>
           </View>
           <View style={{ alignItems: "center", marginBottom: 20 }}>
-            <Text style={{ fontSize: 16, color: "575757" }}>
+            <Text style={{ fontSize: 16, color: "#575757" }}>
               You will receive one email shortly!
             </Text>
           </View>
@@ -145,7 +151,9 @@ export default function CartScreen() {
         <>
           <FlatList
             data={cartItems}
-            keyExtractor={(item) => item._id.toString()}
+            keyExtractor={(item, idx) =>
+              item?._id ? item._id.toString() : idx.toString()
+            }
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={{
@@ -287,46 +295,42 @@ export default function CartScreen() {
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
           />
-          <View style={{ marginBottom: 25 }}>
-            {cartItems?.length === 0 ||
-              (cartItems?.length > 0 && (
+          {cartItems.length > 0 && (
+            <View style={{ marginBottom: 25 }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  textAlign: "center",
+                  marginTop: 20,
+                  fontFamily: "Nunito_700Bold",
+                }}
+              >
+                Total Price: ${calculateTotalPrice()}
+              </Text>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#007BFF",
+                  borderRadius: 5,
+                  padding: 10,
+                  marginTop: 20,
+                  width: "80%",
+                  alignSelf: "center",
+                }}
+                onPress={handlePaymentPress}
+              >
                 <Text
                   style={{
+                    color: "white",
                     fontSize: 18,
                     textAlign: "center",
-                    marginTop: 20,
-                    fontFamily: "Nunito_700Bold",
+                    fontFamily: "Nunito_600SemiBold",
                   }}
                 >
-                  Total Price: ${calculateTotalPrice()}
+                  Go for payment
                 </Text>
-              ))}
-            {cartItems?.length === 0 ||
-              (cartItems?.length > 0 && (
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: "#007BFF",
-                    borderRadius: 5,
-                    padding: 10,
-                    marginTop: 20,
-                    width: "80%",
-                    alignSelf: "center",
-                  }}
-                  onPress={() => handlePayment()}
-                >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontSize: 18,
-                      textAlign: "center",
-                      fontFamily: "Nunito_600SemiBold",
-                    }}
-                  >
-                    Go for payment
-                  </Text>
-                </TouchableOpacity>
-              ))}
-          </View>
+              </TouchableOpacity>
+            </View>
+          )}
         </>
       )}
     </LinearGradient>

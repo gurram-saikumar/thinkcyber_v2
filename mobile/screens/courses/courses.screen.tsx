@@ -1,7 +1,7 @@
 import { SERVER_URI } from "@/utils/uri";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, FlatList } from "react-native";
 import {
   useFonts,
   Raleway_700Bold,
@@ -125,18 +125,17 @@ export default function CoursesScreen() {
             </ScrollView>
           </View>
           <View>
-            <ScrollView style={{ marginHorizontal: 15, gap: 12 }}>
-              {courses?.map((item: CoursesType, index: number) => (
-                <CourseCard item={item} key={index} />
-              ))}
-            </ScrollView>
-            {courses?.length === 0 && (
-              <Text
-                style={{ textAlign: "center", paddingTop: 50, fontSize: 18 }}
-              >
-                No data available!
-              </Text>
-            )}
+            <FlatList
+              data={courses}
+              keyExtractor={(item) => item._id?.toString() ?? item.id?.toString()}
+              renderItem={({ item }) => <CourseCard item={item} />}
+              contentContainerStyle={{ marginHorizontal: 15, gap: 12 }}
+              ListEmptyComponent={
+                <Text style={{ textAlign: "center", paddingTop: 50, fontSize: 18 }}>
+                  No data available!
+                </Text>
+              }
+            />
           </View>
         </LinearGradient>
       )}

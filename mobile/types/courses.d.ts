@@ -40,6 +40,7 @@ type PrerequisiteType = {
 };
 
 type CoursesType = {
+  id: any;
   _id: any;
   name: string;
   description: string;

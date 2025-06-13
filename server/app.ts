@@ -16,6 +16,7 @@ import { Server } from 'socket.io';
 import { swaggerUi, specs } from './utils/swagger';
 import { checkRequiredEnvVars } from './utils/checkEnv';
 
+
 // Load environment variables
 require('dotenv').config();
 
@@ -81,7 +82,7 @@ app.use(limiter);
 // Routes
 app.use('/api/v1', userRouter);
 app.use('/api/v1', courseRouter);
-app.use('/api/v1', orderRouter);
+app.use('/api/v1/order', orderRouter);
 app.use('/api/v1', notificationRouter);
 app.use('/api/v1', analyticsRouter);
 app.use('/api/v1', layoutRouter);
