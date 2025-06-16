@@ -1,4 +1,6 @@
-import React from 'react';
+
+
+import PropTypes from 'prop-types';
 
 const CourseCard = ({ course }) => {
   return (
@@ -43,4 +45,17 @@ const CourseCard = ({ course }) => {
   );
 };
 
-export default CourseCard; 
+CourseCard.propTypes = {
+  course: PropTypes.shape({
+    image: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    level: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    rating: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    duration: PropTypes.string.isRequired,
+    topics: PropTypes.arrayOf(PropTypes.string).isRequired,
+    price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  }).isRequired,
+};
+
+export default CourseCard;

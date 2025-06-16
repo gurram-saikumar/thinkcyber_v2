@@ -1,8 +1,9 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { assets } from '../../assets/assets';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../../context/AppContext';
 import { UserButton, useUser } from '@clerk/clerk-react';
+import PropTypes from 'prop-types';
 
 const Navbar = ({ bgColor }) => {
 
@@ -20,6 +21,9 @@ const Navbar = ({ bgColor }) => {
       </div>
     </div>
   );
+};
+Navbar.propTypes = {
+  bgColor: PropTypes.string
 };
 
 export default Navbar;

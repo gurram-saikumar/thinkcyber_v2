@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../context/AppContext'
 import YouTube from 'react-youtube';
 import { assets } from '../../assets/assets';
@@ -10,7 +10,7 @@ import Rating from '../../components/student/Rating';
 import Footer from '../../components/student/Footer';
 import Loading from '../../components/student/Loading';
 
-const Player = ({ }) => {
+const Player = () => {
 
   const { enrolledCourses, backendUrl, getToken, calculateChapterTime, userData, fetchUserEnrolledCourses } = useContext(AppContext)
 
@@ -54,7 +54,7 @@ const Player = ({ }) => {
 
       const token = await getToken()
 
-      const { data } = await axios.post(backendUrl + '/api/user/update-course-progress',
+      const { data } = await axios.post(backendUrl + '/user/update-course-progress',
         { courseId, lectureId },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -78,7 +78,7 @@ const Player = ({ }) => {
 
       const token = await getToken()
 
-      const { data } = await axios.post(backendUrl + '/api/user/get-course-progress',
+      const { data } = await axios.post(backendUrl + '/user/get-course-progress',
         { courseId },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -101,7 +101,7 @@ const Player = ({ }) => {
 
       const token = await getToken()
 
-      const { data } = await axios.post(backendUrl + '/api/user/add-rating',
+      const { data } = await axios.post(backendUrl + '/user/add-rating',
         { courseId, rating },
         { headers: { Authorization: `Bearer ${token}` } }
       )
