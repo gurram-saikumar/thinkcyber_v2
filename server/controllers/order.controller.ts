@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import ErrorHandler from "../utils/ErrorHandler";
-import { IOrder } from "../models/order.Model";
+import { Order } from "../models/order.Model";
 import User from "../models/user.model";
-import Course from "../models/course.model";
+import { Course } from "../models/course.model";
 import path from "path";
 import ejs from "ejs";
 import sendMail from "../utils/sendMail";
@@ -20,7 +20,7 @@ export const createOrder = catchAsyncError(async (req: Request, res: Response, n
     throw new ErrorHandler("Database connection failed", 500);
   }
 
-  const { courseId, payment_info } = req.body as IOrder;
+  const { courseId, payment_info } = req.body as Order;
 
   if (payment_info) {
     if ("id" in payment_info) {
@@ -37,9 +37,9 @@ export const createOrder = catchAsyncError(async (req: Request, res: Response, n
 
   const user = await User.findByPk(req.user?.id);
 
-  const courseExistInUser = user?.courses.some(
-    (course: any) => course.id === courseId
-  );
+  const courseExistInUser = (user && Array.isArray((user as any).courses))
+    ? (user as any).courses.some((course: any) => course.id === courseId)
+    : false;
 
   if (courseExistInUser) {
     return next(
@@ -55,7 +55,7 @@ export const createOrder = catchAsyncError(async (req: Request, res: Response, n
 
   const data: any = {
     courseId: course.id,
-    userId: user?.id,
+    userId: user?.id as string,
     payment_info,
   };
 
@@ -91,12 +91,16 @@ export const createOrder = catchAsyncError(async (req: Request, res: Response, n
   }
 
   if (user && course) {
-    user.courses.push(course.id);
+    // Ensure user.courses exists and is an array, or update according to your model
+    if (!Array.isArray((user as any).courses)) {
+      (user as any).courses = [];
+    }
+    (user as any).courses.push(course.id);
     await user.save();
   }
 
   await Notification.create({
-    userId: user?.id,
+    userId: user?.id as string,
     title: "New Order",
     message: `You have a new order from ${course?.name}`,
     status: "unread"
@@ -115,12 +119,16 @@ export const createMobileOrder = catchAsyncError(async (req: Request, res: Respo
     throw new ErrorHandler("Database connection failed", 500);
   }
 
-  const { courseId, payment_info } = req.body as IOrder;
+  const { courseId, payment_info } = req.body as Order;
   const user = await User.findByPk(req.user?.id);
 
-  const courseExistInUser = user?.courses.some(
-    (course: any) => course.id === courseId
-  );
+  let courseExistInUser = false;
+  if (user) {
+    const userCourses = await (user as any).getCourses?.() || [];
+    courseExistInUser = userCourses.some(
+      (course: any) => course.id === courseId
+    );
+  }
 
   if (courseExistInUser) {
     return next(
@@ -136,7 +144,7 @@ export const createMobileOrder = catchAsyncError(async (req: Request, res: Respo
 
   const data: any = {
     courseId: course.id,
-    userId: user?.id,
+    userId: user?.id as string,
     payment_info,
   };
 
@@ -172,12 +180,12 @@ export const createMobileOrder = catchAsyncError(async (req: Request, res: Respo
   }
 
   if (user && course) {
-    user.courses.push(course.id);
+    (user as any).courses.push(course.id);
     await user.save();
   }
 
   await Notification.create({
-    userId: user?.id,
+    userId: user?.id as string,
     title: "New Order",
     message: `You have a new order from ${course?.name}`,
     status: "unread"
@@ -196,7 +204,7 @@ export const getAllOrders = catchAsyncError(async (req: Request, res: Response, 
     throw new ErrorHandler("Database connection failed", 500);
   }
 
-  await getAllOrdersService(res, next);
+  await getAllOrdersService(req, res, next);
 });
 
 // send stripe publishable key

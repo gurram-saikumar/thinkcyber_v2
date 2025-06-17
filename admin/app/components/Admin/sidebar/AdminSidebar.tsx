@@ -36,18 +36,26 @@ interface itemProps {
 }
 
 const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected }) => {
+  // Use MenuItem's onClick for navigation instead of nesting <Link>
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.location.href = to;
+  };
   return (
     <MenuItem
       active={selected === title}
-      onClick={() => setSelected(title)}
+      onClick={(e) => {
+        setSelected(title);
+        handleClick(e);
+      }}
       icon={icon}
       className="hover:!bg-[unset]"
     >
-      <Link href={to} className="hover:!bg-[unset]">
+      <span className="hover:!bg-[unset] cursor-pointer">
         <Typography className="!text-[16px] !font-Poppins text-black dark:text-white">
           {title}
         </Typography>
-      </Link>
+      </span>
     </MenuItem>
   );
 };
@@ -126,11 +134,12 @@ const AdminSidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <Link href="/" className="block">
+                {/* Fix: Do not nest <Link> inside another <a> */}
+                <span className="block">
                   <h3 className="text-[25px] font-Poppins uppercase dark:text-white text-black">
                     ThinkCyber
                   </h3>
-                </Link>
+                </span>
                 <IconButton
                   onClick={() => setIsCollapsed(!isCollapsed)}
                   className="inline-block"

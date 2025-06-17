@@ -12,13 +12,20 @@ interface Props {}
 const Page: FC<Props> = (props) => {
   const [route, setRoute] = useState("Login");
   const { user } = useSelector((state: any) => state.auth);
+  const [mounted, setMounted] = useState(false);
 
-  // useEffect(() => {
-  //   if (user) {
-  //     redirect("/admin");
-  //   }
-  // }, [user]);
-  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && user && user.role === "admin") {
+      redirect("/admin");
+    }
+  }, [mounted, user]);
+
+  if (!mounted) return null;
+
   return (
     <div>
       <Heading

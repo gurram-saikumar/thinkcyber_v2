@@ -1,33 +1,35 @@
-'use client'
-import React from 'react'
+"use client";
+import React from "react";
 import AdminSidebar from "../../../components/Admin/sidebar/AdminSidebar";
-import Heading from '../../../../app/utils/Heading';
-import DashboardHeader from '../../../../app/components/Admin/DashboardHeader';
+import Heading from "../../../../app/utils/Heading";
+import DashboardHeader from "../../../../app/components/Admin/DashboardHeader";
 import EditCourse from "../../../components/Admin/Course/EditCourse";
 
-type Props = {}
+type Props = {};
 
-const page = ({params}:any) => {
-    const id = params?.id;
+const page = ({ params }: any) => {
+  const { id } = params; // <-- unwrap params
+
+  if (!id) return <div>Loading...</div>;
 
   return (
     <div>
-        <Heading
-         title="ThinkCyber - Admin"
-         description="ThinkCyber is a platform for students to learn and get help from teachers"
-         keywords="Prograaming,MERN,Redux,Machine Learning"
-        />
-        <div className="flex">
-            <div className="1500px:w-[16%] w-1/5">
-                <AdminSidebar />
-            </div>
-            <div className="w-[85%]">
-               <DashboardHeader />
-               <EditCourse id={id} />
-            </div>
+      <Heading
+        title="ThinkCyber - Admin"
+        description="ThinkCyber is a platform for students to learn and get help from teachers"
+        keywords="Prograaming,MERN,Redux,Machine Learning"
+      />
+      <div className="flex">
+        <div className="1500px:w-[16%] w-1/5">
+          <AdminSidebar />
         </div>
+        <div className="w-[85%]">
+          <DashboardHeader />
+          <EditCourse id={id} />
+        </div>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

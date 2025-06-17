@@ -113,11 +113,11 @@ const AllCourses: FC<Props> = ({ isTeam }) => {
     newData &&
       newData.forEach((item: any) => {
         rows.push({
-          id: item._id,
+          id: item._id || item.email || `${item.name}-${item.email}`,
           name: item.name,
           email: item.email,
           role: item.role,
-          courses: item.courses.length,
+          courses: Array.isArray(item.courses) ? item.courses.length : 0,
           created_at: format(item.createdAt),
         });
       });
@@ -125,11 +125,11 @@ const AllCourses: FC<Props> = ({ isTeam }) => {
     data &&
       data.users.forEach((item: any) => {
         rows.push({
-          id: item._id,
+          id: item._id || item.email || `${item.name}-${item.email}`,
           name: item.name,
           email: item.email,
           role: item.role,
-          courses: item.courses.length,
+          courses: Array.isArray(item.courses) ? item.courses.length : 0,
           created_at: format(item.createdAt),
         });
       });

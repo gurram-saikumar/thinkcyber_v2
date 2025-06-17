@@ -78,7 +78,7 @@ const AllInvoices = ({ isDashboard }: Props) => {
   orderData &&
     orderData.forEach((item: any) => {
       rows.push({
-        id: item._id,
+        id:item._id || item.name || `${item.title}-${item.created_at}`,
         userName: item.userName,
         userEmail: item.userEmail,
         title: item.title,

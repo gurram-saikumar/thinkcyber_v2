@@ -1,8 +1,15 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
-  token: "",
-  user: "",
+interface AuthState {
+  token: string | null;
+  user: string | null;
+  refreshToken?: string | null;
+}
+
+const initialState: AuthState = {
+  token: null,
+  user: null,
+  refreshToken: null,
 };
 
 const authSlice = createSlice({
@@ -25,8 +32,8 @@ const authSlice = createSlice({
       state.user = action.payload.user;
     },
     userLoggedOut: (state) => {
-      state.token = "";
-      state.user = "";
+      state.token = null;
+      state.user = null;
     },
   },
 });

@@ -23,7 +23,11 @@ const EditCourse: FC<Props> = ({ id }) => {
     { refetchOnMountOrArgChange: true }
   );
 
-  const editCourseData = data && data.courses.find((i: any) => i._id === id);
+  const editCourseData = data?.courses.find((i: any) => i._id === id);
+
+// Check before passing
+console.log("Edit Course Data:", editCourseData);
+
 
   useEffect(() => {
     if (isSuccess) {
@@ -137,9 +141,19 @@ const EditCourse: FC<Props> = ({ id }) => {
   };
 
   const handleCourseCreate = async (e: any) => {
-    const data = courseData;
-    console.log(data);
-    await editCourse({ id: editCourseData?._id, data });
+    console.log("Update button clicked");
+    if (!editCourseData) {
+      console.log("editCourseData is missing");
+      toast.error("Course ID is missing. Cannot update course.");
+      return;
+    }
+    if (!editCourseData._id) {
+      console.log("editCourseData._id is missing");
+      toast.error("Course ID is missing. Cannot update course.");
+      return;
+    }
+    console.log("Calling editCourse with id:", editCourseData._id, "and data:", courseData);
+    await editCourse({ id: editCourseData._id, data });
   };
 
   return (
@@ -177,12 +191,13 @@ const EditCourse: FC<Props> = ({ id }) => {
 
         {active === 3 && (
           <CoursePreview
-            active={active}
-            setActive={setActive}
-            courseData={courseData}
+            courseData={editCourseData}
             handleCourseCreate={handleCourseCreate}
+            setActive={setActive}
+            active={active}
             isEdit={true}
           />
+
         )}
       </div>
       <div className="w-[20%] mt-[100px] h-screen fixed z-[-1] top-18 right-0">

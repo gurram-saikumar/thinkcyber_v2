@@ -3,6 +3,8 @@ import CoursePlayer from "../../../utils/CoursePlayer";
 import { styles } from "../../../../app/styles/style";
 import Ratings from "../../../../app/utils/Ratings";
 import { IoCheckmarkDoneOutline } from "react-icons/io5";
+import { useEditCourseMutation } from "@/redux/features/courses/coursesApi";
+import toast from "react-hot-toast";
 
 type Props = {
   active: number;
@@ -26,13 +28,38 @@ const CoursePreview: FC<Props> = ({
 
   const discountPercentengePrice = dicountPercentenge.toFixed(0);
 
+  const [editCourse, { isLoading, isSuccess, isError, error }] = useEditCourseMutation();
+
   const prevButton = () => {
     setActive(active - 1);
   };
 
-  const createCourse = () => {
-    handleCourseCreate();
+  const createCourse = async (e: any) => {
+    e.preventDefault();
+
+    if (isEdit) {
+      console.log("Update button clicked");
+
+      const courseId = courseData?._id || courseData?.id;
+      if (!courseId) {
+        console.error("Course ID is missing.");
+        return;
+      }
+
+      try {
+        const { _id, id, ...coursePayload } = courseData;
+
+        const response = await editCourse({ id: courseId, data: coursePayload }).unwrap();
+        console.log("Course updated:", response);
+        toast.success("Course updated successfully");
+      } catch (err) {
+        console.error("Failed to update course:", err);
+      }
+    } else {
+      handleCourseCreate(e);
+    }
   };
+
 
   return (
     <div className="w-[90%] m-auto py-5 mb-5">
@@ -144,11 +171,11 @@ const CoursePreview: FC<Props> = ({
         </div>
         <div
           className="w-full 800px:w-[180px] flex items-center justify-center h-[40px] bg-[#37a39a] text-center text-[#fff] rounded mt-8 cursor-pointer"
-          onClick={() => createCourse()}
+          onClick={createCourse}
         >
-         {
-          isEdit ? 'Update' : 'Create'
-         }
+          {
+            isEdit ? 'Update' : 'Create'
+          }
         </div>
       </div>
     </div>

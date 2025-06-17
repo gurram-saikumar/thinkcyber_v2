@@ -8,30 +8,26 @@ export const apiSlice = createApi({
     baseUrl: process.env.NEXT_PUBLIC_SERVER_URI,
     prepareHeaders: (headers) => {
       const accessToken = Cookies.get("accessToken");
-      const refreshToken = Cookies.get("refreshToken");
 
       if (accessToken) {
-        headers.set("access-token", accessToken);
+        headers.set("Authorization", `Bearer ${accessToken}`);
       }
-      if (refreshToken) {
-        headers.set("refresh-token", refreshToken);
-      }
+
       return headers;
     },
+    credentials: "include", // This allows cookies like refreshToken to be sent
   }),
   endpoints: (builder) => ({
     refreshToken: builder.query({
-      query: (data) => ({
+      query: () => ({
         url: "refresh",
         method: "GET",
-        credentials: "include" as const,
       }),
     }),
     loadUser: builder.query({
-      query: (data) => ({
+      query: () => ({
         url: "me",
         method: "GET",
-        credentials: "include" as const,
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
@@ -43,15 +39,12 @@ export const apiSlice = createApi({
               user: result.data.user,
             })
           );
-        } catch (error: any) {
-          console.log(error);
+        } catch (err) {
+          console.error("Error loading user:", JSON.stringify(err, null, 2));
         }
       },
     }),
   }),
 });
 
-export const { 
-  useRefreshTokenQuery, 
-  useLoadUserQuery
-} = apiSlice;
+export const { useRefreshTokenQuery, useLoadUserQuery } = apiSlice;
