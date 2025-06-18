@@ -2,7 +2,8 @@
 import React, { FC, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { store } from "../redux/features/store";
-import { useLoadUserQuery, useRefreshTokenQuery } from "@/redux/features/api/apiSlice";
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
+import { useRefreshUserTokenMutation } from "@/redux/features/auth/authApi";
 import Loader from "./components/Loader/Loader";
 import socketIO from "socket.io-client";
 import { SessionProvider } from "next-auth/react";
@@ -22,21 +23,22 @@ export function Providers({ children }: ProvidersProps) {
 
 export const Custom: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading, isError } = useLoadUserQuery({});
+  const [refreshToken] = useRefreshUserTokenMutation();
   const [isMounted, setIsMounted] = useState(false);
   const [tokenRefreshed, setTokenRefreshed] = useState(false);
 
   // Check if we need to refresh the token
   useEffect(() => {
     const accessToken = Cookies.get("accessToken");
-    const refreshToken = Cookies.get("refreshToken");
+    const tokenExists = Cookies.get("refreshToken");
     
     // If we have a refresh token but no access token or the access token is invalid
-    if (refreshToken && (!accessToken || isError)) {
+    if (tokenExists && (!accessToken || isError)) {
       // Trigger a token refresh
-      store.dispatch(useRefreshTokenQuery({}).initiate({}));
+      refreshToken({});
       setTokenRefreshed(true);
     }
-  }, [isError]);
+  }, [isError, refreshToken]);
 
   useEffect(() => {
     socketId.on("connection", () => {});

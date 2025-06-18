@@ -10,6 +10,7 @@ type RegistrationResponse = {
 type RegistrationData = {};
 
 export const authApi = apiSlice.injectEndpoints({
+  overrideExisting: false,
   endpoints: (builder) => ({
     // endpoints here
     register: builder.mutation<RegistrationResponse, RegistrationData>({
@@ -69,7 +70,7 @@ export const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
-    refreshToken: builder.mutation({
+    refreshUserToken: builder.mutation({
       query: () => ({
         url: "refresh",
         method: "GET",
@@ -149,6 +150,6 @@ export const {
   useActivationMutation,
   useLoginMutation,
   useSocialAuthMutation,
-  useRefreshTokenMutation,
+  useRefreshUserTokenMutation,
   useLogOutQuery,
 } = authApi;
