@@ -12,6 +12,7 @@ type Props = {
   courseContentData: any;
   setCourseContentData: (courseContentData: any) => void;
   handleSubmit: any;
+  isEdit?: boolean;
 };
 
 const CourseContent: FC<Props> = ({
@@ -20,6 +21,7 @@ const CourseContent: FC<Props> = ({
   active,
   setActive,
   handleSubmit: handlleCourseSubmit,
+  isEdit = false,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(
     Array(courseContentData.length).fill(false)

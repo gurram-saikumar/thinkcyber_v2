@@ -53,10 +53,21 @@ export default function OrdersAnalytics({ isDashboard }: Props) {
 
   const analyticsData: any = [];
 
-  data &&
+  if (data && data.orders && data.orders.last12Months) {
     data.orders.last12Months.forEach((item: any) => {
-      analyticsData.push({ name: item.name, Count: item.count });
+      // Use month property if available, fallback to name
+      const monthName = item.month || item.name || 'Unknown';
+      analyticsData.push({ name: monthName, Count: item.count });
     });
+  
+    // If we have no valid data after processing, add placeholder data
+    if (analyticsData.length === 0) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      months.forEach(month => {
+        analyticsData.push({ name: month, Count: 0 });
+      });
+    }
+  }
 
   return (
     <>

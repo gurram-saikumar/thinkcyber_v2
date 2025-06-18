@@ -1,25 +1,22 @@
 'use client'
 import React from 'react'
-import Heading from '../../../app/utils/Heading';
 import AllInvoices from "../../../app/components/Admin/Order/AllInvoices";
-import AdminLayout from '@/app/components/Admin/Layout/AdminLayout';
-import AdminProtected from '@/app/hooks/adminProtected';
+import { Box, Typography } from "@mui/material";
 
 type Props = {}
 
 const Page = (props: Props) => {
   return (
-    <div>
-      <AdminProtected>
-        <Heading
-          title="ThinkCyber - Admin Invoices"
-          description="ThinkCyber is a platform for students to learn and get help from teachers"
-          keywords="Programming,MERN,Redux,Machine Learning"
-        />
-        <AdminLayout>
-          <AllInvoices />
-        </AdminLayout>
-      </AdminProtected>
+    <div className="p-4">
+      <Box mb={4}>
+        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+          Invoices Management
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          View and manage all orders and invoices
+        </Typography>
+      </Box>
+      <AllInvoices />
     </div>
   )
 }

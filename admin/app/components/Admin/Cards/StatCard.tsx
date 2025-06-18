@@ -70,11 +70,14 @@ const StatCard: React.FC<StatCardProps> = ({
 }) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  
-  // Calculate progress value - cap at 100% for positive and 0% for negative
+    // Calculate progress value - cap at 100% for positive and 0% for negative
+  // Also cap the actual display value to be reasonable (max +/- 100%)
   const progressValue = percentChange > 0 ? 
     Math.min(percentChange, 100) : 
     Math.max(0, 100 + percentChange);
+  
+  // Limit the displayed percentage change to a reasonable range (-100% to +100%)
+  const displayPercentChange = Math.max(-100, Math.min(100, percentChange));
 
   return (
     <div 
@@ -113,7 +116,7 @@ const StatCard: React.FC<StatCardProps> = ({
                 percentChange >= 0 ? "text-[#3ccba0]" : "text-[#ff5252]"
               }`}
             >
-              {`${percentChange >= 0 ? "+" : ""}${percentChange.toFixed(2)}%`}
+              {`${displayPercentChange >= 0 ? "+" : ""}${displayPercentChange.toFixed(1)}%`}
             </p>
           )}
         </div>

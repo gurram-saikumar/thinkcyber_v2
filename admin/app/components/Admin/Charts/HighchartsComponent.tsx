@@ -67,12 +67,18 @@ const HighchartsComponent: React.FC<HighchartsComponentProps> = ({
      (('name' in item && ('count' in item || 'Count' in item)) || 
       ('month' in item && 'count' in item)))
   );
-  
-  // Format data for Highcharts based on chart type
+    // Format data for Highcharts based on chart type
   const formattedData = !data || data.length === 0 || !isValidData ? [0] : 
     chartType === "pie" 
-      ? data.map(item => ({ name: item.name || item.month || 'Unknown', y: item.count || item.Count || 0 }))
-      : data.map(item => item.count || item.Count || 0);
+      ? data.map(item => ({ 
+          name: typeof item.name === 'string' ? item.name : 'Unknown', 
+          y: typeof item.count === 'number' ? item.count : 0 
+        }))
+      : data.map(item => {
+          if (typeof item.count === 'number') return item.count;
+          if (typeof item.Count === 'number') return item.Count;
+          return 0;
+        });
 
   // Create chart options only if we have valid data
   const chartOptions: Highcharts.Options = {

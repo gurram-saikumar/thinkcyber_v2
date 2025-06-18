@@ -10,6 +10,7 @@ type Props = {
   setPrerequisites: (prerequisites: { title: string }[]) => void;
   active: number;
   setActive: (active: number) => void;
+  isEdit?: boolean;
 };
 
 const CourseData: FC<Props> = ({
@@ -19,6 +20,7 @@ const CourseData: FC<Props> = ({
   setPrerequisites,
   active,
   setActive,
+  isEdit = false,
 }) => {
 
   const handleBenefitChange = (index: number, value: any) => {

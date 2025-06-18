@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from "react";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, Button, Modal } from "@mui/material";
+import { GridColDef } from "@mui/x-data-grid";
+import { Box, Button, Modal, Tooltip, IconButton, Chip } from "@mui/material";
 import { AiOutlineDelete, AiOutlineMail } from "react-icons/ai";
 import { useTheme } from "next-themes";
 import Loader from "../../Loader/Loader";
@@ -12,6 +12,7 @@ import {
 } from "@/redux/features/user/userApi";
 import { styles } from "@/app/styles/style";
 import { toast } from "react-hot-toast";
+import ModernTable from "../Table/ModernTable";
 
 type Props = {
   isTeam?: boolean;
@@ -60,32 +61,91 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
   }, [updateError, isSuccess, deleteSuccess, deleteError]);
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", flex: 0.3 },
-    { field: "name", headerName: "Name", flex: 0.5 },
-    { field: "email", headerName: "Email", flex: 0.5 },
-    { field: "role", headerName: "Role", flex: 0.5 },
-    { field: "courses", headerName: "Purchased Courses", flex: 0.5 },
-    { field: "created_at", headerName: "Joined At", flex: 0.5 },
+    { 
+      field: "id", 
+      headerName: "ID", 
+      flex: 0.3,
+      minWidth: 80,
+      renderCell: (params: any) => (
+        <Tooltip title={params.value}>
+          <span className="font-medium">
+            {String(params.value).length > 10 ? `${String(params.value).slice(0, 8)}...` : params.value}
+          </span>
+        </Tooltip>
+      )
+    },
+    { 
+      field: "name", 
+      headerName: "Name", 
+      flex: 0.5,
+      minWidth: 120,
+      renderCell: (params: any) => (
+        <span className="font-medium">{params.value}</span>
+      )
+    },
+    { 
+      field: "email", 
+      headerName: "Email", 
+      flex: 0.5,
+      minWidth: 180,
+      renderCell: (params: any) => (
+        <span className="text-sm">{params.value}</span>
+      )
+    },
+    { 
+      field: "role", 
+      headerName: "Role", 
+      flex: 0.5,
+      minWidth: 100,
+      renderCell: (params: any) => (
+        <Chip 
+          label={params.value} 
+          color={params.value === "admin" ? "primary" : "default"} 
+          variant="outlined" 
+          size="small"
+        />
+      )
+    },
+    { 
+      field: "courses", 
+      headerName: "Purchased Courses", 
+      flex: 0.5,
+      minWidth: 150,
+      renderCell: (params: any) => (
+        <span className="font-medium">{params.value}</span>
+      )
+    },
+    { 
+      field: "created_at", 
+      headerName: "Joined At", 
+      flex: 0.5,
+      minWidth: 120,
+      renderCell: (params: any) => (
+        <span className="text-sm">{params.value}</span>
+      )
+    },
     {
       field: "delete",
       headerName: "Delete",
       flex: 0.2,
+      minWidth: 60,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      renderCell: (params) => {
+      renderCell: (params: any) => {
         return (
-          <Button
-            onClick={() => {
-              setOpen(!open);
-              setUserId(params.row.id);
-            }}
-          >
-            <AiOutlineDelete
-              className="dark:text-white text-black"
-              size={20}
-            />
-          </Button>
+          <Tooltip title="Delete User">
+            <IconButton
+              color="error"
+              onClick={() => {
+                setOpen(!open);
+                setUserId(params.row.id);
+              }}
+              size="small"
+            >
+              <AiOutlineDelete size={18} />
+            </IconButton>
+          </Tooltip>
         );
       },
     },
@@ -93,14 +153,21 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
       field: "email_action",
       headerName: "Email",
       flex: 0.2,
+      minWidth: 60,
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-      renderCell: (params) => {
+      renderCell: (params: any) => {
         return (
-          <a href={`mailto:${params.row.email}`}>
-            <AiOutlineMail className="dark:text-white text-black" size={20} />
-          </a>
+          <Tooltip title={`Email ${params.row.name}`}>
+            <IconButton 
+              color="primary"
+              href={`mailto:${params.row.email}`}
+              size="small"
+            >
+              <AiOutlineMail size={18} />
+            </IconButton>
+          </Tooltip>
         );
       },
     },
@@ -147,13 +214,13 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
   };
 
   return (
-    <div className="mt-[120px]">
+    <div className="w-full">
       {isLoading ? (
         <Loader />
       ) : (
-        <Box m="20px">
+        <Box>
           {isTeam && (
-            <div className="w-full flex justify-end">
+            <div className="w-full flex justify-end mb-5">
               <div
                 className={`${styles.button} !w-[200px] !rounded-[10px] dark:bg-[#57c7a3] !h-[35px] dark:border dark:border-[#ffffff6c]`}
                 onClick={() => setActive(!active)}
@@ -162,81 +229,15 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
               </div>
             </div>
           )}
-          <Box
-            m="40px 0 0 0"
-            height="80vh"
-            sx={{
-              "& .MuiDataGrid-root": {
-                border: "none",
-                outline: "none",
-              },
-              "& .css-pqjvzy-MuiSvgIcon-root-MuiSelect-icon": {
-                color: theme === "dark" ? "#fff" : "#000",
-              },
-              "& .MuiDataGrid-sortIcon": {
-                color: theme === "dark" ? "#fff" : "#000",
-              },
-              "& .MuiDataGrid-row": {
-                color: theme === "dark" ? "#fff" : "#000",
-                borderBottom:
-                  theme === "dark"
-                    ? "1px solid #ffffff30!important"
-                    : "1px solid #ccc!important",
-              },
-              "& .MuiTablePagination-root": {
-                color: theme === "dark" ? "#fff" : "#000",
-              },
-              "& .MuiDataGrid-cell": {
-                borderBottom: "none!important",
-              },
-              "& .name-column--cell": {
-                color: theme === "dark" ? "#fff" : "#000",
-              },
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
-                borderBottom: "none",
-                color: theme === "dark" ? "#fff" : "#000",
-              },
-              "& .MuiDataGrid-virtualScroller": {
-                backgroundColor: theme === "dark" ? "#1F2A40" : "#F2F0F0",
-              },
-              "& .MuiDataGrid-footerContainer": {
-                color: theme === "dark" ? "#fff" : "#000",
-                borderTop: "none",
-                backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
-              },
-              "& .MuiCheckbox-root": {
-                color:
-                  theme === "dark" ? `#b7ebde !important` : `#000 !important`,
-              },
-              "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                color: `#fff !important`,
-              },
-            }}
-          >
-            <DataGrid 
-              rows={rows} 
+          <Box height="70vh">
+            <ModernTable
+              rows={rows}
               columns={columns}
-              disableRowSelectionOnClick
-              initialState={{
-                pagination: { 
-                  paginationModel: { pageSize: 10 } 
-                },
-              }}
-              pageSizeOptions={[5, 10, 25]}
-              getRowId={(row) => row.id}
-              checkboxSelection={false}
-              autoHeight
-              disableColumnSelector
-              density="standard"
               loading={isLoading}
-              components={{
-                NoRowsOverlay: () => (
-                  <div className="flex justify-center items-center h-full">
-                    <p className="text-gray-500 dark:text-gray-400">No users found</p>
-                  </div>
-                ),
-              }}
+              enableSelection={false}
+              enableToolbar={true}
+              enablePagination={true}
+              pageSize={10}
             />
           </Box>
           {active && (
