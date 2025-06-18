@@ -1,4 +1,4 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableOpacity, ImageBackground, Dimensions } from "react-native";
 import {
   Nunito_400Regular,
   Nunito_600SemiBold,
@@ -22,46 +22,156 @@ export default function WelcomeIntroScreen() {
     return null;
   }
 
-  const renderItem = ({ item }: { item: onboardingSwiperDataType }) => (
+  const renderItem = ({ item, index }: { item: onboardingSwiperDataType, index: number }) => (
     <LinearGradient
-      colors={["#E5ECF9", "F6F7F9", "#E8EEF9"]}
-      style={{ flex: 1, paddingHorizontal: 16 }}
+      colors={["#302fc1", "#302fc1", "#8B93FF"]}
+      style={{ flex: 1 }}
     >
-      <View style={{ marginTop: 80 }}>
-        <Image
-          source={item.image}
-          style={{ alignSelf: "center", marginBottom: 30 }}
-        />
-        <Text style={[commonStyles.title, { fontFamily: "Raleway_700Bold" }]}>
-          {item.title}
-        </Text>
-        <View style={{ marginTop: 15 }}>
-          <Text
-            style={[
-              commonStyles.description,
-              { fontFamily: "Nunito_400Regular" },
-            ]}
-          >
+
+      <ImageBackground source={require('../../../mobile/assets/onboarding/Group 3 1 (1).png')}
+        resizeMode="contain"
+        style={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height, alignSelf: 'center', right: 0 }}>
+
+          {/* Content Container */}
+        <View style={{
+          bottom:0,
+          alignItems:'center',
+        position:'absolute'
+        }}>
+<View style={{ 
+  flexDirection: 'row',  // ✅ Ensures horizontal layout
+  justifyContent: 'center', 
+  alignItems: 'center',
+  marginBottom: 16 
+}}>
+           {onboardingSwiperData.map((_, dotIndex) => (
+            <View
+              key={dotIndex}
+              style={{
+                backgroundColor: dotIndex === index ? '#FFFFFF' : 'rgba(255, 255, 255, 0.3)',
+                width: dotIndex === index ? 24 : 8,
+                height: 8,
+                borderRadius: 4,
+                marginHorizontal: 4,
+              }}
+            />
+          ))}</View>
+          <Text style={{
+            fontSize: 24,
+            fontWeight: '700',
+            color: '#FFFFFF',
+            textAlign: 'center',
+            fontFamily: "Raleway_700Bold",
+            lineHeight: 32,
+          }}>
+            {item.title}
+          </Text>
+          
+          <Text style={{
+            fontSize: 16,
+            color: '#E8EAFF',
+            textAlign: 'center',
+            lineHeight: 24,
+            paddingHorizontal: 10,
+            fontFamily: "Nunito_400Regular"
+          }}>
             {item.description}
           </Text>
-          <Text
-            style={[
-              commonStyles.description,
-              { fontFamily: "Nunito_400Regular" },
-            ]}
+          
+          {item.sortDescrition && (
+            <Text style={{
+              fontSize: 16,
+              color: '#E8EAFF',
+              textAlign: 'center',
+              lineHeight: 24,
+              paddingHorizontal: 10,
+              marginTop: 4,
+              fontFamily: "Nunito_400Regular"
+            }}>
+              {item.sortDescrition}
+            </Text>
+          )}
+          
+          {item.sortDescrition2 && (
+            <Text style={{
+              fontSize: 16,
+              color: '#E8EAFF',
+              textAlign: 'center',
+              lineHeight: 24,
+              paddingHorizontal: 10,
+              marginTop: 4,
+              fontFamily: "Nunito_400Regular"
+            }}>
+              {item.sortDescrition2}
+            </Text>
+          )}
+
+         
+
+          
+          {/* Sign In Button */}
+          <TouchableOpacity 
+            style={{
+              backgroundColor: '#FFFFFF',
+              paddingVertical: 16,
+              borderRadius: 12,
+              alignItems: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              elevation: 3,
+            }}
+            onPress={() => router.push("/login")}
           >
-            {item.sortDescrition}
-          </Text>
-          <Text
-            style={[
-              commonStyles.description,
-              { fontFamily: "Nunito_400Regular" },
-            ]}
+            <Text style={{
+              color: '#6B73FF',
+              fontSize: 16,
+              fontWeight: '600',
+              fontFamily: "Nunito_600SemiBold"
+            }}>
+              Sign in
+            </Text>
+          </TouchableOpacity>
+
+          {/* Continue without signing in Button */}
+          <TouchableOpacity 
+            style={{
+              paddingVertical: 16,
+              alignItems: 'center',
+            }}
+            onPress={() => router.push("/login")}
           >
-            {item.sortDescrition2}
-          </Text>
+            <Text style={{
+              color: '#FFFFFF',
+              fontSize: 16,
+              fontWeight: '600',
+              fontFamily: "Nunito_600SemiBold"
+            }}>
+              Continue without signing in
+            </Text>
+          </TouchableOpacity>
         </View>
-      </View>
+
+        {/* Pagination Dots */}
+        {/* <View style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: 30,
+        }}> */}
+          
+        {/* </View> */}
+
+        {/* Buttons Container */}
+        {/* <View style={{
+          gap: 16,
+          marginBottom: 20,
+        }}> */}
+        {/* </View> */}
+
+      </ImageBackground>
+
     </LinearGradient>
   );
 
@@ -75,28 +185,14 @@ export default function WelcomeIntroScreen() {
       onSkip={() => {
         router.push("/login");
       }}
-      renderNextButton={() => (
-        <View style={styles.welcomeButtonStyle}>
-          <Text
-            style={[styles.buttonText, { fontFamily: "Nunito_600SemiBold" }]}
-          >
-            Next
-          </Text>
-        </View>
-      )}
-      renderDoneButton={() => (
-        <View style={styles.welcomeButtonStyle}>
-          <Text
-            style={[styles.buttonText, { fontFamily: "Nunito_600SemiBold" }]}
-          >
-            Done
-          </Text>
-        </View>
-      )}
-      showSkipButton={false}
-      dotStyle={commonStyles.dotStyle}
-      bottomButton={true}
-      activeDotStyle={commonStyles.activeDotStyle}
+      renderNextButton={() => null}
+      renderDoneButton={() => null}
+      showDoneButton={false}
+      showNextButton={false}
+      dotStyle={{ display: 'none' }}
+      bottomButton={false}
+      activeDotStyle={{ display: 'none' }}
     />
   );
 }
+

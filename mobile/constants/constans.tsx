@@ -1,25 +1,25 @@
 export const onboardingSwiperData: onboardingSwiperDataType[] = [
   {
     id: 1,
-    title: "Start your learning journey with dose of fun!",
-    description: "Our engaging learning videos will spark",
-    sortDescrition: "your curiosity & enjoyable.",
-    image: require("@/assets/onboarding/intro_1.png"),
+    title: "For teachers",
+    description: "Reimagine teaching with engaging stories that spark curiosity both in class and at home. ",
+    sortDescrition: "",
+    image: require("@/assets/onboarding/Group 3 1 (1).png"),
   },
   {
     id: 2,
-    title: "Discover your passion, elevate your expertise",
-    description: "Our comprehensive our courses and expert",
-    sortDescrition: "instructors to guide every step.",
-    image: require("@/assets/onboarding/intro_2.png"),
+    title: "For parents",
+    description: "Create a world of learning with stories rooted in educator expertise or your personal journey. ",
+    sortDescrition: "",
+    image: require("@/assets/onboarding/Group 5 1.png"),
   },
   {
     id: 3,
-    title: "Get online certificate with Unusual skills",
-    description: "To earn an online certificate, individuals",
-    sortDescrition: "typically need to complete the required",
-    sortDescrition2: "coursework & assessments.",
-    image: require("@/assets/onboarding/intro_3.png"),
+    title: "For kids",
+    description: "Turn screen time into progress with captivating stories that drive you forward",
+    sortDescrition: "",
+    sortDescrition2: "",
+    image: require("@/assets/onboarding/Group 4 1.png"),
   },
 ];
 

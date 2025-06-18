@@ -8,26 +8,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { TouchableOpacity } from "react-native";
-import {
-  AntDesign,
-  Entypo,
-  FontAwesome,
-  Fontisto,
-  Ionicons,
-  SimpleLineIcons,
-} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import {
-  useFonts,
-  Raleway_700Bold,
-  Raleway_600SemiBold,
-} from "@expo-google-fonts/raleway";
-import {
-  Nunito_400Regular,
-  Nunito_500Medium,
-  Nunito_700Bold,
-  Nunito_600SemiBold,
-} from "@expo-google-fonts/nunito";
 import { useState } from "react";
 import { commonStyles } from "@/styles/common/common.styles";
 import { router } from "expo-router";
@@ -49,19 +31,7 @@ export default function SignUpScreen() {
   const [error, setError] = useState({
     password: "",
   });
-
-  let [fontsLoaded, fontError] = useFonts({
-    Raleway_600SemiBold,
-    Raleway_700Bold,
-    Nunito_400Regular,
-    Nunito_500Medium,
-    Nunito_700Bold,
-    Nunito_600SemiBold,
-  });
-
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
+  const [isChecked, setChecked] = useState(false);
 
   const handlePasswordValidation = (value: string) => {
     const password = value;
@@ -144,219 +114,161 @@ export default function SignUpScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={["#E5ECF9", "#F6F7F9"]}
-      style={{ flex: 1, paddingTop: 20 }}
-    >
-      <ScrollView>
-        <Image
-          style={styles.signInImage}
-          source={require("@/assets/sign-in/signup.png")}
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.skip}>
+        <Text style={styles.skipText}>Sign Up Later</Text>
+      </TouchableOpacity>
+
+      <View style={styles.logoBox}>
+        <Text style={styles.logo}>ThinkCyber</Text>
+        <Text style={styles.heading}>Sign up</Text>
+      </View>
+
+      <View style={styles.form}>
+        <TextInput
+          style={styles.input}
+          placeholder="Full Name (Required)"
+          value={userInfo.name}
+          onChangeText={(text) => setUserInfo({ ...userInfo, name: text })}
         />
-        <Text style={[styles.welcomeText, { fontFamily: "Raleway_700Bold" }]}>
-          Let's get started!
-        </Text>
-        <Text style={styles.learningText}>
-          Create an account to Becodemy to get all features
-        </Text>
-        <View style={styles.inputContainer}>
-          <View>
-            <TextInput
-              style={[styles.input, { paddingLeft: 40, marginBottom: -12 }]}
-              keyboardType="default"
-              value={userInfo.name}
-              placeholder="shahriar sajeeb"
-              onChangeText={(value: any) =>
-                setUserInfo({ ...userInfo, name: value })
-              }
+        <TextInput
+          style={styles.input}
+          placeholder="E-mail (Required)"
+          keyboardType="email-address"
+          value={userInfo.email}
+          onChangeText={(text) => setUserInfo({ ...userInfo, email: text })}
+        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.input, { flex: 1 }]}
+            placeholder="Password (Required)"
+            secureTextEntry={!isPasswordVisible}
+            value={userInfo.password}
+            onChangeText={(text) => setUserInfo({ ...userInfo, password: text })}
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setPasswordVisible(!isPasswordVisible)}
+          >
+            <Ionicons
+              name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
+              size={22}
+              color="#747474"
             />
-            <AntDesign
-              style={{ position: "absolute", left: 26, top: 14 }}
-              name="user"
-              size={20}
-              color={"#A1A1A1"}
-            />
-          </View>
-          <View>
-            <TextInput
-              style={[styles.input, { paddingLeft: 40 }]}
-              keyboardType="email-address"
-              value={userInfo.email}
-              placeholder="support@becodemy.com"
-              onChangeText={(value: any) =>
-                setUserInfo({ ...userInfo, email: value })
-              }
-            />
-            <Fontisto
-              style={{ position: "absolute", left: 26, top: 17.8 }}
-              name="email"
-              size={20}
-              color={"#A1A1A1"}
-            />
-            {required && (
-              <View style={commonStyles.errorContainer}>
-                <Entypo name="cross" size={18} color={"red"} />
-              </View>
-            )}
-            <View style={{ marginTop: 15 }}>
-              <TextInput
-                style={commonStyles.input}
-                keyboardType="default"
-                secureTextEntry={!isPasswordVisible}
-                defaultValue=""
-                placeholder="********"
-                onChangeText={handlePasswordValidation}
-              />
-              <TouchableOpacity
-                style={styles.visibleIcon}
-                onPress={() => setPasswordVisible(!isPasswordVisible)}
-              >
-                {isPasswordVisible ? (
-                  <Ionicons
-                    name="eye-off-outline"
-                    size={23}
-                    color={"#747474"}
-                  />
-                ) : (
-                  <Ionicons name="eye-outline" size={23} color={"#747474"} />
-                )}
-              </TouchableOpacity>
-              <SimpleLineIcons
-                style={styles.icon2}
-                name="lock"
-                size={20}
-                color={"#A1A1A1"}
-              />
-            </View>
-            {error.password && (
-              <View style={[commonStyles.errorContainer, { top: 145 }]}>
-                <Entypo name="cross" size={18} color={"red"} />
-                <Text style={{ color: "red", fontSize: 11, marginTop: -1 }}>
-                  {error.password}
-                </Text>
-              </View>
-            )}
-
-            <TouchableOpacity
-              style={{
-                padding: 16,
-                borderRadius: 8,
-                marginHorizontal: 16,
-                backgroundColor: "#2467EC",
-                marginTop: 15,
-              }}
-              onPress={handleSignIn}
-            >
-              {buttonSpinner ? (
-                <ActivityIndicator size="small" color={"white"} />
-              ) : (
-                <Text
-                  style={{
-                    color: "white",
-                    textAlign: "center",
-                    fontSize: 16,
-                    fontFamily: "Raleway_700Bold",
-                  }}
-                >
-                  Sign Up
-                </Text>
-              )}
-            </TouchableOpacity>
-
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 20,
-                gap: 10,
-              }}
-            >
-              <TouchableOpacity>
-                <FontAwesome name="google" size={30} />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <FontAwesome name="github" size={30} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.signupRedirect}>
-              <Text style={{ fontSize: 18, fontFamily: "Raleway_600SemiBold" }}>
-                Already have an account?
-              </Text>
-              <TouchableOpacity onPress={() => router.push("/(routes)/login")}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontFamily: "Raleway_600SemiBold",
-                    color: "#2467EC",
-                    marginLeft: 5,
-                  }}
-                >
-                  Sign In
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-    </LinearGradient>
+
+        <View style={styles.termsRow}>
+          <TouchableOpacity onPress={() => setChecked(!isChecked)}>
+            <View style={styles.checkbox}>
+              {isChecked && <View style={styles.checkedBox} />}
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.termsText}>
+            By creating an account, I accept ThinkCyber's{' '}
+            <Text style={styles.link}>Terms of Use</Text> and{' '}
+            <Text style={styles.link}>Privacy Notice</Text>
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={[styles.createButton, { backgroundColor: isChecked ? '#0056D2' : '#D3D3D3' }]}
+          disabled={!isChecked}
+        >
+          <Text style={styles.buttonText}>Create an account</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  signInImage: {
-    width: "60%",
-    height: 250,
-    alignSelf: "center",
-    marginTop: 50,
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: 40,
   },
-  welcomeText: {
-    textAlign: "center",
-    fontSize: 24,
+  skip: {
+    alignItems: 'flex-end',
+    paddingRight: 20,
+    marginBottom: 10,
   },
-  learningText: {
-    textAlign: "center",
-    color: "#575757",
-    fontSize: 15,
-    marginTop: 5,
+  skipText: {
+    color: '#2467EC',
+    fontWeight: '600',
   },
-  inputContainer: {
-    marginHorizontal: 16,
-    marginTop: 30,
-    rowGap: 30,
+  logoBox: {
+    alignItems: 'center',
+    marginVertical: 30,
+  },
+  logo: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#0056D2',
+  },
+  heading: {
+    fontSize: 22,
+    marginTop: 8,
+    fontWeight: '600',
+  },
+  form: {
+    paddingHorizontal: 20,
+    rowGap: 16,
   },
   input: {
-    height: 55,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    paddingLeft: 35,
-    fontSize: 16,
-    backgroundColor: "white",
-    color: "#A1A1A1",
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: '#fff',
   },
-  visibleIcon: {
-    position: "absolute",
-    right: 30,
-    top: 15,
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  icon2: {
-    position: "absolute",
-    left: 23,
-    top: 17.8,
-    marginTop: -2,
+  eyeIcon: {
+    position: 'absolute',
+    right: 12,
   },
-  forgotSection: {
-    marginHorizontal: 16,
-    textAlign: "right",
-    fontSize: 16,
-    marginTop: 10,
+  termsRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 12,
   },
-  signupRedirect: {
-    flexDirection: "row",
-    marginHorizontal: 16,
-    justifyContent: "center",
-    marginBottom: 20,
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1.5,
+    borderColor: '#555',
+    marginRight: 10,
+    marginTop: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkedBox: {
+    width: 12,
+    height: 12,
+    backgroundColor: '#2467EC',
+  },
+  termsText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#444',
+  },
+  link: {
+    color: '#2467EC',
+    textDecorationLine: 'underline',
+  },
+  createButton: {
     marginTop: 20,
+    height: 48,
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });
