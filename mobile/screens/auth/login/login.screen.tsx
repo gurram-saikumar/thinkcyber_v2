@@ -112,217 +112,208 @@ export default function LoginScreen() {
       });
   };
 
-  return (
-    <LinearGradient
-      colors={["#E5ECF9", "#F6F7F9"]}
-      style={{ flex: 1, paddingTop: 20 }}
-    >
-      <ScrollView>
-        <Image
-          style={styles.signInImage}
-          source={require("@/assets/sign-in/sign_in.png")}
-        />
-        <Text style={[styles.welcomeText, { fontFamily: "Raleway_700Bold" }]}>
-          Welcome Back!
-        </Text>
-        <Text style={styles.learningText}>
-          Login to your existing account of Becodemy
-        </Text>
-        <View style={styles.inputContainer}>
-          <View>
-            <TextInput
-              style={[styles.input, { paddingLeft: 40 }]}
-              keyboardType="email-address"
-              value={userInfo.email}
-              placeholder="support@becodemy.com"
-              onChangeText={(value) =>
-                setUserInfo({ ...userInfo, email: value })
-              }
-            />
-            <Fontisto
-              style={{ position: "absolute", left: 26, top: 17.8 }}
-              name="email"
-              size={20}
-              color={"#A1A1A1"}
-            />
-            {required && (
-              <View style={commonStyles.errorContainer}>
-                <Entypo name="cross" size={18} color={"red"} />
-              </View>
-            )}
-            <View style={{ marginTop: 15 }}>
-              <TextInput
-                style={commonStyles.input}
-                keyboardType="default"
-                secureTextEntry={!isPasswordVisible}
-                defaultValue=""
-                placeholder="********"
-                onChangeText={handlePasswordValidation}
-              />
-              <TouchableOpacity
-                style={styles.visibleIcon}
-                onPress={() => setPasswordVisible(!isPasswordVisible)}
-              >
-                {isPasswordVisible ? (
-                  <Ionicons
-                    name="eye-off-outline"
-                    size={23}
-                    color={"#747474"}
-                  />
-                ) : (
-                  <Ionicons name="eye-outline" size={23} color={"#747474"} />
-                )}
-              </TouchableOpacity>
-              <SimpleLineIcons
-                style={styles.icon2}
-                name="lock"
-                size={20}
-                color={"#A1A1A1"}
-              />
-            </View>
-            {error.password && (
-              <View style={[commonStyles.errorContainer, { top: 145 }]}>
-                <Entypo name="cross" size={18} color={"red"} />
-                <Text style={{ color: "red", fontSize: 11, marginTop: -1 }}>
-                  {error.password}
-                </Text>
-              </View>
-            )}
-            <TouchableOpacity
-              onPress={() => router.push("/(routes)/forgot-password")}
-            >
-              <Text
-                style={[
-                  styles.forgotSection,
-                  { fontFamily: "Nunito_600SemiBold" },
-                ]}
-              >
-                Forgot Password?
-              </Text>
-            </TouchableOpacity>
+return (
+    <LinearGradient colors={["#E5ECF9", "#F6F7F9"]} style={{ flex: 1, marginTop: 18 }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Skip / Later */}
+        <TouchableOpacity style={styles.skipButton}>
+          <Text style={styles.skipText}>Sign Up Later</Text>
+        </TouchableOpacity>
 
-            <TouchableOpacity
-              style={{
-                padding: 16,
-                borderRadius: 8,
-                marginHorizontal: 16,
-                backgroundColor: "#2467EC",
-                marginTop: 15,
-              }}
-              onPress={handleSignIn}
-            >
-              {buttonSpinner ? (
-                <ActivityIndicator size="small" color={"white"} />
-              ) : (
-                <Text
-                  style={{
-                    color: "white",
-                    textAlign: "center",
-                    fontSize: 16,
-                    fontFamily: "Raleway_700Bold",
-                  }}
-                >
-                  Sign In
-                </Text>
-              )}
-            </TouchableOpacity>
-
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 20,
-                gap: 10,
-              }}
-            >
-              <TouchableOpacity>
-                <FontAwesome name="google" size={30} />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <FontAwesome name="github" size={30} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.signupRedirect}>
-              <Text style={{ fontSize: 18, fontFamily: "Raleway_600SemiBold" }}>
-                Don't have an account?
-              </Text>
-              <TouchableOpacity
-                onPress={() => router.push("/(routes)/sign-up")}
-              >
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontFamily: "Raleway_600SemiBold",
-                    color: "#2467EC",
-                    marginLeft: 5,
-                  }}
-                >
-                  Sign Up
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+        {/* Branding */}
+        <View style={styles.headerPanel}>
+          <Text style={styles.brandTitle}>ThinkCyber</Text>
+          <Text style={styles.brandSubTitle}>
+            Learn coding from industry experts and top universities
+          </Text>
         </View>
+
+        {/* Login or Signup Title */}
+        <Text style={styles.sectionTitle}>Log in or Sign up</Text>
+
+        {/* Social Buttons */}
+        {/* <View style={styles.socialRow}>
+          <TouchableOpacity style={styles.socialButton}>
+            <FontAwesome name="google" size={20} />
+            <Text style={styles.socialText}>Google</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.socialButton}>
+            <FontAwesome name="facebook" size={20} />
+            <Text style={styles.socialText}>Facebook</Text>
+          </TouchableOpacity>
+        </View> */}
+
+        {/* SSO */}
+        <TouchableOpacity style={styles.ssoButton}>
+          <SimpleLineIcons name="organization" size={16} style={{ marginRight: 6 }} />
+          <Text style={styles.ssoText}>Google</Text>
+        </TouchableOpacity>
+
+        {/* Login with Email */}
+        <TouchableOpacity
+          style={styles.emailButton}
+          onPress={() => router.push("/(routes)/sign-in-email")}
+        >
+          <Text style={styles.emailText}>Log in with Email</Text>
+        </TouchableOpacity>
+
+        {/* Divider */}
+        <View style={styles.dividerContainer}>
+          <View style={styles.divider} />
+          <Text style={styles.dividerText}>or</Text>
+          <View style={styles.divider} />
+        </View>
+
+        {/* Sign Up */}
+        <TouchableOpacity
+          onPress={() => router.push("/(routes)/sign-up")}
+          style={styles.signupButton}
+        >
+          {buttonSpinner ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Text style={styles.signupText}>New to ThinkCyber? Create an Account!</Text>
+          )}
+        </TouchableOpacity>
+
+        {/* Legal */}
+        <Text style={styles.legalText}>
+          By creating an account under any method above, you accept ThinkCyber’s{" "}
+          <Text style={styles.legalLink}>Terms of Use</Text> and{" "}
+          <Text style={styles.legalLink}>Privacy Notice</Text>.
+        </Text>
       </ScrollView>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  signInImage: {
-    width: "60%",
-    height: 250,
-    alignSelf: "center",
-    marginTop: 50,
+  container: {
+    flexGrow: 1,
+    paddingHorizontal: 16,
+    paddingTop: 30,
   },
-  welcomeText: {
-    textAlign: "center",
-    fontSize: 24,
+  skipButton: {
+    alignSelf: "flex-start",
+    paddingBottom: 10,
   },
-  learningText: {
-    textAlign: "center",
-    color: "#575757",
-    fontSize: 15,
-    marginTop: 5,
+  skipText: {
+    color: "#2467EC",
+    fontSize: 14,
+    fontFamily: "Nunito_600SemiBold",
   },
-  inputContainer: {
-    marginHorizontal: 16,
-    marginTop: 30,
-    rowGap: 30,
-  },
-  input: {
-    height: 55,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    paddingLeft: 35,
-    fontSize: 16,
-    backgroundColor: "white",
-    color: "#A1A1A1",
-  },
-  visibleIcon: {
-    position: "absolute",
-    right: 30,
-    top: 15,
-  },
-  icon2: {
-    position: "absolute",
-    left: 23,
-    top: 17.8,
-    marginTop: -2,
-  },
-  forgotSection: {
-    marginHorizontal: 16,
-    textAlign: "right",
-    fontSize: 16,
+  headerPanel: {
+    backgroundColor: "#2467EC",
+    paddingVertical: 30,
+    paddingHorizontal: 20,
     marginTop: 10,
+    marginBottom: 30,
+    borderRadius: 8,
   },
-  signupRedirect: {
-    flexDirection: "row",
-    marginHorizontal: 16,
-    justifyContent: "center",
+  brandTitle: {
+    color: "white",
+    fontSize: 24,
+    fontFamily: "Raleway_700Bold",
+    textAlign: "center",
+  },
+  brandSubTitle: {
+    color: "white",
+    fontSize: 14,
+    textAlign: "center",
+    marginTop: 8,
+    fontFamily: "Nunito_400Regular",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: "Raleway_700Bold",
+    textAlign: "center",
     marginBottom: 20,
-    marginTop: 20,
+  },
+  socialRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  socialButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 6,
+    paddingVertical: 10,
+    marginHorizontal: 5,
+    alignItems: "center",
+  },
+  socialText: {
+    fontSize: 12,
+    marginTop: 4,
+    fontFamily: "Nunito_400Regular",
+  },
+  ssoButton: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 6,
+    paddingVertical: 12,
+    marginBottom: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ssoText: {
+    fontSize: 14,
+    fontFamily: "Nunito_400Regular",
+  },
+  emailButton: {
+    borderWidth: 1,
+    borderColor: "#2467EC",
+    borderRadius: 6,
+    paddingVertical: 12,
+    marginBottom: 12,
+    alignItems: "center",
+  },
+  emailText: {
+    color: "#2467EC",
+    fontFamily: "Raleway_700Bold",
+    fontSize: 16,
+  },
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 8,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#ccc",
+  },
+  dividerText: {
+    marginHorizontal: 10,
+    color: "#999",
+    fontFamily: "Nunito_400Regular",
+  },
+  signupButton: {
+    backgroundColor: "#2467EC",
+    paddingVertical: 12,
+    borderRadius: 6,
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  signupText: {
+    color: "white",
+    fontFamily: "Raleway_700Bold",
+    fontSize: 16,
+    textAlign: "center",
+    paddingHorizontal: 12,
+  },
+  legalText: {
+    fontSize: 12,
+    textAlign: "center",
+    color: "#666",
+    paddingHorizontal: 10,
+    lineHeight: 18,
+    fontFamily: "Nunito_400Regular",
+  },
+  legalLink: {
+    color: "#2467EC",
+    textDecorationLine: "underline",
   },
 });
