@@ -8,6 +8,7 @@ interface CourseAttributes {
     name: string;
     description: string;
     categories: string;
+    subcategories: string;
     price: number;
     thumbnail: {
         public_id: string;
@@ -60,6 +61,7 @@ export class Course extends Model<CourseAttributes, CourseCreationAttributes> im
     public name!: string;
     public description!: string;
     public categories!: string;
+    public subcategories!: string;
     public price!: number;
     public thumbnail!: {
         public_id: string;
@@ -125,6 +127,10 @@ Course.init(
         categories: {
             type: DataTypes.STRING,
             allowNull: false,
+        },
+        subcategories: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         price: {
             type: DataTypes.DECIMAL(10, 2),

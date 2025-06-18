@@ -65,6 +65,22 @@ export const createLayout = catchAsyncError(async (req: Request, res: Response, 
     });
   }
 
+  if (type === "Subcategories") {
+    const { subcategories } = req.body;
+    const subcategoriesItems = await Promise.all(
+      subcategories.map(async (item: any) => {
+        return {
+          title: item.title,
+          categoryId: item.categoryId
+        };
+      })
+    );
+    await Layout.create({
+      type: "Subcategories",
+      subcategories: subcategoriesItems,
+    });
+  }
+
   res.status(200).json({
     success: true,
     message: "Layout created successfully",
@@ -137,6 +153,7 @@ export const editLayout = catchAsyncError(async (req: Request, res: Response, ne
         type: "Categories",
         categories: categories.map((item: any) => ({
           title: item.title,
+          _id: item._id || undefined
         })),
       });
     } else {
@@ -146,9 +163,42 @@ export const editLayout = catchAsyncError(async (req: Request, res: Response, ne
           type: "Categories",
           categories: categories.map((item: any) => ({
             title: item.title,
+            _id: item._id || undefined
           })),
         },
         { where: { id: categoriesData.id } }
+      );
+    }
+  }
+
+  if (type === "Subcategories") {
+    const { subcategories } = req.body;
+    const subcategoriesData = await Layout.findOne({
+      where: { type: "Subcategories" },
+    });
+
+    if (!subcategoriesData) {
+      // If no subcategories exist, create new ones
+      await Layout.create({
+        type: "Subcategories",
+        subcategories: subcategories.map((item: any) => ({
+          title: item.title,
+          categoryId: item.categoryId,
+          _id: item._id || undefined
+        })),
+      });
+    } else {
+      // Update existing subcategories
+      await Layout.update(
+        {
+          type: "Subcategories",
+          subcategories: subcategories.map((item: any) => ({
+            title: item.title,
+            categoryId: item.categoryId,
+            _id: item._id || undefined
+          })),
+        },
+        { where: { id: subcategoriesData.id } }
       );
     }
   }

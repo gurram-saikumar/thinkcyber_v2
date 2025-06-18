@@ -20,14 +20,35 @@ const CourseInformation: FC<Props> = ({
   isEdit = false,
 }) => {
   const [dragging, setDragging] = useState(false);
-  const { data } = useGetHeroDataQuery("Categories", {});
+  const { data: categoriesData } = useGetHeroDataQuery("Categories", {});
+  const { data: subcategoriesData } = useGetHeroDataQuery("Subcategories", {});
   const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [filteredSubcategories, setFilteredSubcategories] = useState([]);
 
   useEffect(() => {
-    if (data?.layout?.categories) {
-      setCategories(data.layout.categories);
+    if (categoriesData?.layout?.categories) {
+      setCategories(categoriesData.layout.categories);
     }
-  }, [data]);
+  }, [categoriesData]);
+
+  useEffect(() => {
+    if (subcategoriesData?.layout?.subcategories) {
+      setSubcategories(subcategoriesData.layout.subcategories);
+    }
+  }, [subcategoriesData]);
+
+  useEffect(() => {
+    // Filter subcategories based on selected category
+    if (courseInfo.categories && subcategories.length > 0) {
+      const filtered = subcategories.filter(
+        (sub: any) => sub.categoryId === courseInfo.categories
+      );
+      setFilteredSubcategories(filtered);
+    } else {
+      setFilteredSubcategories([]);
+    }
+  }, [courseInfo.categories, subcategories]);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -208,8 +229,8 @@ const CourseInformation: FC<Props> = ({
             >
               <option value="">Select Category</option>
               {categories &&
-                categories.map((item: any) => (
-                  <option value={item.title} key={item._id}>
+                categories.map((item: any, index: number) => (
+                  <option value={item.title} key={item._id || `category-${index}`}>
                     {item.title}
                   </option>
                 ))}
@@ -218,6 +239,35 @@ const CourseInformation: FC<Props> = ({
         </motion.div>
         
         <motion.div className="w-full flex justify-between flex-wrap" variants={itemVariant}>
+          <div className="w-full md:w-[45%] mb-5">
+            <label className={`text-gray-700 dark:text-gray-200 font-medium`}>
+              Course Subcategory
+            </label>
+            <select
+              name=""
+              id=""
+              className={`${styles.input} transition-all focus:border-blue-500 focus:ring focus:ring-blue-200 ${!courseInfo.categories ? 'opacity-60 cursor-not-allowed' : ''}`}
+              value={courseInfo.subcategories || ""}
+              onChange={(e: any) =>
+                setCourseInfo({ ...courseInfo, subcategories: e.target.value })
+              }
+              disabled={!courseInfo.categories}
+            >
+              <option value="">Select Subcategory</option>
+              {filteredSubcategories.length > 0 &&
+                filteredSubcategories.map((item: any, index: number) => (
+                  <option value={item.title} key={item._id || `subcategory-${index}`}>
+                    {item.title}
+                  </option>
+                ))}
+              {courseInfo.categories && filteredSubcategories.length === 0 && (
+                <option value="" disabled>No subcategories available</option>
+              )}
+            </select>
+            {!courseInfo.categories && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Select a category first</p>
+            )}
+          </div>
           <div className="w-full md:w-[45%] mb-5">
             <label className={`text-gray-700 dark:text-gray-200 font-medium`}>Course Level</label>
             <input
@@ -233,6 +283,9 @@ const CourseInformation: FC<Props> = ({
               className={`${styles.input} transition-all focus:border-blue-500 focus:ring focus:ring-blue-200`}
             />
           </div>
+        </motion.div>
+        
+        <motion.div className="w-full flex justify-between flex-wrap" variants={itemVariant}>
           <div className="w-full md:w-[45%] mb-5">
             <label className={`text-gray-700 dark:text-gray-200 font-medium`}>Demo Url</label>
             <input
@@ -247,6 +300,9 @@ const CourseInformation: FC<Props> = ({
               placeholder="eer74fd"
               className={`${styles.input} transition-all focus:border-blue-500 focus:ring focus:ring-blue-200`}
             />
+          </div>
+          <div className="w-full md:w-[45%] mb-5">
+            {/* Empty div for layout balance */}
           </div>
         </motion.div>
         

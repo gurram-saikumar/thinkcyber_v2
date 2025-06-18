@@ -89,6 +89,8 @@ const AdminSidebar = () => {
       setSelected("FAQ");
     } else if (pathname === "/admin/categories") {
       setSelected("Categories");
+    } else if (pathname === "/admin/subcategories") {
+      setSelected("Subcategories");
     } else if (pathname === "/admin/team") {
       setSelected("Manage Team");
     } else if (pathname === "/admin/courses-analytics") {
@@ -266,6 +268,13 @@ const AdminSidebar = () => {
             <Item
               title="Categories"
               to="/admin/categories"
+              icon={<WysiwygIcon className="text-black dark:text-white" />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Subcategories"
+              to="/admin/subcategories"
               icon={<WysiwygIcon className="text-black dark:text-white" />}
               selected={selected}
               setSelected={setSelected}

@@ -1,3 +1,5 @@
+"use client";
+
 import { styles } from "@/app/styles/style";
 import {
   useEditLayoutMutation,
@@ -29,9 +31,20 @@ const EditFaq = (props: Props) => {
       toast.success("FAQ updated successfully");
     }
 
-    if (error && "data" in error) {
-      const errorData = error as any;
-      toast.error(errorData?.data?.message || "Something went wrong.");
+    if (error) {
+      // Safely extract error information without logging the full error object
+      if ("data" in error) {
+        const errorData = error as any;
+        const errorMessage = errorData?.data?.message || "Something went wrong";
+        console.error("Layout update error:", errorMessage);
+        toast.error(errorMessage);
+      } else if ("message" in error) {
+        console.error("Layout update error:", (error as Error).message);
+        toast.error((error as Error).message || "Something went wrong");
+      } else {
+        console.error("Layout update error occurred");
+        toast.error("Something went wrong");
+      }
     }
   }, [data, layoutSuccess, error]);
 

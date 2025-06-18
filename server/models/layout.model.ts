@@ -8,6 +8,13 @@ interface FaqItem {
 
 interface Category {
     title: string;
+    _id?: string;
+}
+
+interface SubCategory {
+    title: string;
+    categoryId: string;
+    _id?: string;
 }
 
 interface BannerImage {
@@ -20,6 +27,7 @@ interface LayoutAttributes {
     type: string;
     faq: FaqItem[];
     categories: Category[];
+    subcategories: SubCategory[];
     banner: {
         image: BannerImage;
         title: string;
@@ -36,6 +44,7 @@ class Layout extends Model<LayoutAttributes, LayoutCreationAttributes> implement
     public type!: string;
     public faq!: FaqItem[];
     public categories!: Category[];
+    public subcategories!: SubCategory[];
     public banner!: {
         image: BannerImage;
         title: string;
@@ -76,6 +85,17 @@ Layout.init(
             },
             set(value) {
                 this.setDataValue('categories', JSON.stringify(value));
+            }
+        },
+        subcategories: {
+            type: DataTypes.TEXT,
+            defaultValue: '[]',
+            get() {
+                const value = this.getDataValue('subcategories');
+                return value ? JSON.parse(value) : [];
+            },
+            set(value) {
+                this.setDataValue('subcategories', JSON.stringify(value));
             }
         },
         banner: {

@@ -69,6 +69,33 @@ export const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
+    refreshToken: builder.mutation({
+      query: () => ({
+        url: "refresh",
+        method: "GET",
+        credentials: "include" as const,
+      }),
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          Cookies.set("accessToken", result.data.accessToken);
+          Cookies.set("refreshToken", result.data.refreshToken);
+          dispatch(
+            userLoggedIn({
+              accessToken: result.data.accessToken,
+              refreshToken: result.data.refreshToken,
+              user: result.data.user,
+            })
+          );
+        } catch (error: any) {
+          console.log("Refresh token error:", error);
+          // If token refresh fails, log the user out
+          Cookies.remove("accessToken");
+          Cookies.remove("refreshToken");
+          dispatch(userLoggedOut());
+        }
+      },
+    }),
     socialAuth: builder.mutation({
       query: ({ email, name, avatar }) => ({
         url: "social-auth",
@@ -106,6 +133,8 @@ export const authApi = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
+          Cookies.remove("accessToken");
+          Cookies.remove("refreshToken");
           dispatch(userLoggedOut());
         } catch (error: any) {
           console.log(error);
@@ -120,5 +149,6 @@ export const {
   useActivationMutation,
   useLoginMutation,
   useSocialAuthMutation,
+  useRefreshTokenMutation,
   useLogOutQuery,
 } = authApi;

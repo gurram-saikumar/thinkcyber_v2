@@ -1,3 +1,5 @@
+"use client";
+
 import {
   useEditLayoutMutation,
   useGetHeroDataQuery,
@@ -33,10 +35,29 @@ const EditCategories = (props: Props) => {
     }
 
     if (error) {
-      console.error("Layout update error:", error);
+      // Safely extract error information without logging the full error object
       if ("data" in error) {
         const errorData = error as any;
-        toast.error(errorData?.data?.message || "Something went wrong");
+        const errorMessage = errorData?.data?.message || "Something went wrong";
+        console.error("Layout update error:", errorMessage);
+        
+        // Special handling for authentication errors
+        if (errorMessage.includes("Access token is not valid") || 
+            errorMessage.includes("Not authenticated") || 
+            errorMessage.includes("jwt")) {
+          toast.error("Your session has expired. Please refresh the page or log in again.");
+          
+          // You could also redirect to login here if needed
+          // window.location.href = "/login";
+        } else {
+          toast.error(errorMessage);
+        }
+      } else if ("message" in error) {
+        console.error("Layout update error:", (error as Error).message);
+        toast.error((error as Error).message || "Something went wrong");
+      } else {
+        console.error("Layout update error occurred");
+        toast.error("Something went wrong");
       }
     }
   }, [layoutSuccess, error, refetch]);
