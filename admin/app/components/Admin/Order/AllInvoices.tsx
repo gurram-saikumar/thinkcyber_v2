@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
 import { useTheme } from "next-themes";
 import { useGetAllCoursesQuery } from "@/redux/features/courses/coursesApi";
@@ -42,7 +42,7 @@ const AllInvoices = ({ isDashboard }: Props) => {
     }
   }, [data, usersData, coursesData]);
 
-  const columns: any = [
+  const columns: GridColDef[] = [
     { field: "id", headerName: "ID", flex: 0.3 },
     { field: "userName", headerName: "Name", flex: isDashboard ? 0.6 : 0.5 },
     ...(isDashboard
@@ -56,9 +56,12 @@ const AllInvoices = ({ isDashboard }: Props) => {
       ? [{ field: "created_at", headerName: "Created At", flex: 0.5 }]
       : [
           {
-            field: " ",
+            field: "email_action",
             headerName: "Email",
             flex: 0.2,
+            sortable: false,
+            filterable: false,
+            disableColumnMenu: true,
             renderCell: (params: any) => {
               return (
                 <a href={`mailto:${params.row.userEmail}`}>
@@ -147,10 +150,21 @@ const AllInvoices = ({ isDashboard }: Props) => {
             }}
           >
             <DataGrid
-              checkboxSelection={isDashboard ? false : true}
               rows={rows}
               columns={columns}
-              components={isDashboard ? {} : { Toolbar: GridToolbar }}
+              disableRowSelectionOnClick
+              initialState={{
+                pagination: { 
+                  paginationModel: { pageSize: 10 } 
+                },
+              }}
+              pageSizeOptions={[5, 10, 25]}
+              getRowId={(row) => row.id}
+              autoHeight
+              density="standard"
+              loading={isLoading}
+              slots={isDashboard ? {} : { toolbar: GridToolbar }}
+              checkboxSelection={!isDashboard}
             />
           </Box>
         </Box>

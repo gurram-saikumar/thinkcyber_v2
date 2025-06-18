@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Modal } from "@mui/material";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useTheme } from "next-themes";
@@ -25,45 +25,47 @@ const AllCourses = (props: Props) => {
     { refetchOnMountOrArgChange: true }
   );
   const [deleteCourse, { isSuccess, error }] = useDeleteCourseMutation({});
-  const columns = [
+  const columns: GridColDef[] = [
     { field: "id", headerName: "ID", flex: 0.5 },
     { field: "title", headerName: "Course Title", flex: 1 },
     { field: "ratings", headerName: "Ratings", flex: 0.5 },
     { field: "purchased", headerName: "Purchased", flex: 0.5 },
     { field: "created_at", headerName: "Created At", flex: 0.5 },
     {
-      field: "  ",
+      field: "edit",
       headerName: "Edit",
       flex: 0.2,
-      renderCell: (params: any) => {
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => {
         return (
-          <>
-            <Link href={`/admin/edit-course/${params.row.id}`}>
-              <FiEdit2 className="dark:text-white text-black" size={20} />
-            </Link>
-          </>
+          <Link href={`/admin/edit-course/${params.row.id}`}>
+            <FiEdit2 className="dark:text-white text-black" size={20} />
+          </Link>
         );
       },
     },
     {
-      field: " ",
+      field: "delete",
       headerName: "Delete",
       flex: 0.2,
-      renderCell: (params: any) => {
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => {
         return (
-          <>
-            <Button
-              onClick={() => {
-                setOpen(!open);
-                setCourseId(params.row.id);
-              }}
-            >
-              <AiOutlineDelete
-                className="dark:text-white text-black"
-                size={20}
-              />
-            </Button>
-          </>
+          <Button
+            onClick={() => {
+              setOpen(!open);
+              setCourseId(params.row.id);
+            }}
+          >
+            <AiOutlineDelete
+              className="dark:text-white text-black"
+              size={20}
+            />
+          </Button>
         );
       },
     },
@@ -161,7 +163,22 @@ const AllCourses = (props: Props) => {
               },
             }}
           >
-            <DataGrid checkboxSelection rows={rows} columns={columns} />
+            <DataGrid 
+              rows={rows} 
+              columns={columns}
+              disableRowSelectionOnClick
+              initialState={{
+                pagination: { 
+                  paginationModel: { pageSize: 10 } 
+                },
+              }}
+              pageSizeOptions={[5, 10, 25]}
+              getRowId={(row) => row.id}
+              autoHeight
+              disableColumnSelector
+              density="standard"
+              loading={isLoading}
+            />
           </Box>
           {open && (
             <Modal

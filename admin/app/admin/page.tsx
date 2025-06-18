@@ -1,32 +1,32 @@
 "use client";
 import React from "react";
-import Heading from "../utils/Heading";
-import AdminSidebar from "../components/Admin/sidebar/AdminSidebar";
-import AdminProtected from "../hooks/adminProtected";
 import DashboardHero from "../components/Admin/DashboardHero";
+import AllUsers from "../components/Admin/Users/AllUsers";
+import AllCourses from "../components/Admin/Course/AllCourses";
+import AllInvoices from "../components/Admin/Order/AllInvoices";
 
-type Props = {};
-
-const page = (props: Props) => {
+export default function AdminPage() {
   return (
-    <div>
-      <AdminProtected>
-        <Heading
-          title="ThinkCyber - Admin"
-          description="ThinkCyber is a platform for students to learn and get help from teachers"
-          keywords="Programming,MERN,Redux,Machine Learning"
-        />
-        <div className="flex min-h-screen">
-          <div className="1500px:w-[16%] w-1/5">
-            <AdminSidebar />
-          </div>
-          <div className="w-[85%]">
-            <DashboardHero isDashboard={true} />
-          </div>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+      <DashboardHero isDashboard={true} />
+      
+      <div className="mt-8 grid grid-cols-1 gap-8">
+        <div className="bg-white dark:bg-[#111c44] rounded-lg p-4 shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Recent Users</h2>
+          <AllUsers isTeam={true} />
         </div>
-      </AdminProtected>
+        
+        <div className="bg-white dark:bg-[#111c44] rounded-lg p-4 shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Recent Courses</h2>
+          <AllCourses />
+        </div>
+        
+        <div className="bg-white dark:bg-[#111c44] rounded-lg p-4 shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Recent Invoices</h2>
+          <AllInvoices isDashboard={true} />
+        </div>
+      </div>
     </div>
   );
-};
-
-export default page;
+}

@@ -76,26 +76,32 @@ const Verification: FC<Props> = ({ setRoute }) => {
   };
 
   return (
-    <div>
-      <h1 className={`${styles.title}`}>Verify Your Account</h1>
-      <br />
-      <div className="w-full flex items-center justify-center mt-2">
-        <div className="w-[80px] h-[80px] rounded-full bg-[#497DF2] flex items-center justify-center">
-          <VscWorkspaceTrusted size={40} />
+    <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-900 shadow-lg rounded-xl p-8 transition-all duration-300">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white font-Poppins">
+          Verify Your Account
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300 mt-2 font-Poppins">
+          Enter the verification code sent to your email
+        </p>
+      </div>
+
+      <div className="w-full flex items-center justify-center mt-2 mb-8">
+        <div className="w-[80px] h-[80px] rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
+          <VscWorkspaceTrusted size={40} className="text-white" />
         </div>
       </div>
-      <br />
-      <br />
-      <div className="m-auto flex items-center justify-around">
+
+      <div className="flex items-center justify-center space-x-4 mb-8">
         {Object.keys(verifyNumber).map((key, index) => (
           <input
             type="number"
             key={key}
             ref={inputRefs[index]}
-            className={`w-[65px] h-[65px] bg-transparent border-[3px] rounded-[10px] flex items-center text-black dark:text-white justify-center text-[18px] font-Poppins outline-none text-center ${
+            className={`w-[65px] h-[65px] bg-gray-50 dark:bg-gray-800 border-2 rounded-lg flex items-center text-black dark:text-white justify-center text-[22px] font-Poppins outline-none text-center transition-all duration-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 ${
               invalidError
                 ? "shake border-red-500"
-                : "dark:border-white border-[#0000004a]"
+                : "dark:border-gray-700 border-gray-300"
             }`}
             placeholder=""
             maxLength={1}
@@ -104,23 +110,25 @@ const Verification: FC<Props> = ({ setRoute }) => {
           />
         ))}
       </div>
-      <br />
-      <br />
-      <div className="w-full flex justify-center">
-        <button className={`${styles.button}`} onClick={verificationHandler}>
-          Verify OTP
-        </button>
+
+      <button
+        className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-Poppins mb-6"
+        onClick={verificationHandler}
+      >
+        Verify Code
+      </button>
+
+      <div className="text-center">
+        <p className="text-sm text-gray-600 dark:text-gray-300 font-Poppins">
+          Go back to sign in?{" "}
+          <span
+            onClick={() => setRoute("Login")}
+            className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200 focus:outline-none focus:underline cursor-pointer"
+          >
+            Sign in
+          </span>
+        </p>
       </div>
-      <br />
-      <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">
-        Go back to sign in?{" "}
-        <span
-          className="text-[#2190ff] pl-1 cursor-pointer"
-          onClick={() => setRoute("Login")}
-        >
-          Sign in
-        </span>
-      </h5>
     </div>
   );
 };

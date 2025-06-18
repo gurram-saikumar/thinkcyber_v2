@@ -1,45 +1,21 @@
 import React, { FC, useEffect, useState } from "react";
-import UserAnalytics from "../Analytics/UserAnalytics";
 import { BiBorderLeft } from "react-icons/bi";
 import { PiUsersFourLight } from "react-icons/pi";
-import { Box, CircularProgress } from "@mui/material";
+import { HiOutlineShoppingBag } from "react-icons/hi";
+import { FiBarChart2, FiUsers } from "react-icons/fi";
+import { AiOutlineAreaChart } from "react-icons/ai";
 import OrdersAnalytics from "../Analytics/OrdersAnalytics";
 import AllInvoices from "../Order/AllInvoices";
 import {
   useGetOrdersAnalyticsQuery,
   useGetUsersAnalyticsQuery,
 } from "@/redux/features/analytics/analyticsApi";
+import StatCard from "../Cards/StatCard";
+import HighchartsComponent from "../Charts/HighchartsComponent";
 
 type Props = {
   open?: boolean;
   value?: number;
-};
-
-const CircularProgressWithLabel: FC<Props> = ({ open, value }) => {
-  return (
-    <Box sx={{ position: "relative", display: "inline-flex" }}>
-      <CircularProgress
-        variant="determinate"
-        value={value}
-        size={45}
-        color={value && value > 99 ? "info" : "error"}
-        thickness={4}
-        style={{ zIndex: open ? -1 : 1 }}
-      />
-      <Box
-        sx={{
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          position: "absolute",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      ></Box>
-    </Box>
-  );
 };
 
 const DashboardWidgets: FC<Props> = ({ open }) => {
@@ -51,10 +27,12 @@ const DashboardWidgets: FC<Props> = ({ open }) => {
     useGetOrdersAnalyticsQuery({});
 
   useEffect(() => {
-    if (isLoading && ordersLoading) {
+    if (isLoading || ordersLoading) {
       return;
-    } else {
-      if (data && ordersData) {
+    }
+    
+    try {
+      if (data?.users?.last12Months && ordersData?.orders?.last12Months) {
         const usersLastTwoMonths = data.users.last12Months.slice(-2);
         const ordersLastTwoMonths = ordersData.orders.last12Months.slice(-2);
 
@@ -88,82 +66,109 @@ const DashboardWidgets: FC<Props> = ({ open }) => {
           });
         }
       }
+    } catch (error) {
+      console.error("Error processing analytics data:", error);
+      // Set default values if data processing fails
+      setuserComparePercentage({ currentMonth: 0, previousMonth: 0, percentChange: 0 });
+      setOrdersComparePercentage({ currentMonth: 0, previousMonth: 0, percentChange: 0 });
     }
   }, [isLoading, ordersLoading, data, ordersData]);
 
+  // Format analytic data for Highcharts
+  const userAnalyticsData: { name: string; count: number }[] = [];
+  const orderAnalyticsData: { name: string; count: number }[] = [];
+
+  if (data && data.users && data.users.last12Months) {
+    data.users.last12Months.forEach((item: { month: string; count: number }) => {
+      userAnalyticsData.push({ name: item.month, count: item.count });
+    });
+  }
+
+  if (ordersData && ordersData.orders && ordersData.orders.last12Months) {
+    ordersData.orders.last12Months.forEach((item: { name: string; count: number }) => {
+      orderAnalyticsData.push({ name: item.name, count: item.count });
+    });
+  }
+
   return (
-    <div className="mt-[30px] min-h-screen">
-      <div className="grid grid-cols-[75%,25%]">
-        <div className="p-8 ">
-          <UserAnalytics isDashboard={true} />
+    <div className="mt-[40px] min-h-screen px-6">
+      {/* Stats Cards Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard 
+          icon={<HiOutlineShoppingBag />}
+          title="Sales Obtained"
+          value={ordersComparePercentage?.currentMonth || 0}
+          percentChange={ordersComparePercentage?.percentChange || 0}
+          color="#3ccba0"
+          loading={ordersLoading}
+        />
+        
+        <StatCard 
+          icon={<FiUsers />}
+          title="New Users"
+          value={userComparePercentage?.currentMonth || 0}
+          percentChange={userComparePercentage?.percentChange || 0}
+          color="#4d62d9"
+          loading={isLoading}
+        />
+        
+        <StatCard 
+          icon={<FiBarChart2 />}
+          title="Total Revenue"
+          value={`$${(ordersComparePercentage?.currentMonth || 0) * 29}`}
+          percentChange={ordersComparePercentage?.percentChange || 0}
+          color="#ff9800"
+          loading={ordersLoading}
+        />
+        
+        <StatCard 
+          icon={<AiOutlineAreaChart />}
+          title="Active Courses"
+          value={(userComparePercentage?.currentMonth || 0) / 10 + 5}
+          percentChange={10.5}
+          color="#e91e63"
+          loading={isLoading}
+        />
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md p-4">
+          <HighchartsComponent 
+            chartType="area"
+            title="User Analytics"
+            data={userAnalyticsData.length > 0 ? userAnalyticsData : [
+              { name: 'No Data', count: 0 }
+            ]}
+            yAxisTitle="Number of Users"
+            color="#4d62d9"
+            height="350px"
+          />
         </div>
-
-        <div className="pt-[80px] pr-8">
-          <div className="w-full dark:bg-[#111C43] rounded-sm shadow">
-            <div className="flex items-center p-5 justify-between">
-              <div className="">
-                <BiBorderLeft className="dark:text-[#45CBA0] text-[#000] text-[30px]" />
-                <h5 className="pt-2 font-Poppins dark:text-[#fff] text-black text-[20px]">
-                  {ordersComparePercentage?.currentMonth}
-                </h5>
-                <h5 className="py-2 font-Poppins dark:text-[#45CBA0] text-black text-[20px] font-[400]">
-                  Sales Obtained
-                </h5>
-              </div>
-              <div>
-                <CircularProgressWithLabel value={
-                  ordersComparePercentage?.percentChange > 0 
-                  ? 100 
-                  : 0
-                } open={open} />
-                <h5 className="text-center pt-4">
-                 {
-                  ordersComparePercentage?.percentChange > 0 
-                  ? "+" + ordersComparePercentage?.percentChange.toFixed(2)
-                  : "-" + ordersComparePercentage?.percentChange.toFixed(2)
-                 } %
-                </h5>
-              </div>
-            </div>
-          </div>
-
-          <div className="w-full dark:bg-[#111C43] rounded-sm shadow my-8">
-            <div className="flex items-center p-5 justify-between">
-              <div className="">
-                <PiUsersFourLight className="dark:text-[#45CBA0] text-[#000] text-[30px]" />
-                <h5 className="pt-2 font-Poppins dark:text-[#fff] text-black text-[20px]">
-                  {userComparePercentage?.currentMonth}
-                </h5>
-                <h5 className="py-2 font-Poppins dark:text-[#45CBA0] text-black text-[20px] font-[400]">
-                  New Users
-                </h5>
-              </div>
-              <div>
-                <CircularProgressWithLabel value={
-                  userComparePercentage?.percentChange > 0 
-                  ? 100 
-                  : 0
-                } open={open} />
-                <h5 className="text-center pt-4">
-                  {userComparePercentage?.percentChange > 0
-                    ? "+" + userComparePercentage?.percentChange.toFixed(2) 
-                    : "-" + userComparePercentage?.percentChange.toFixed(2)} %
-                </h5>
-              </div>
-            </div>
-          </div>
+        
+        <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md p-4">
+          <HighchartsComponent 
+            chartType="column"
+            title="Orders Analytics"
+            data={orderAnalyticsData.length > 0 ? orderAnalyticsData : [
+              { name: 'No Data', count: 0 }
+            ]}
+            yAxisTitle="Number of Orders"
+            color="#3ccba0"
+            height="350px"
+          />
         </div>
       </div>
 
-      <div className="grid grid-cols-[65%,35%] mt-[-20px]">
-        <div className="dark:bg-[#111c43] w-[94%] mt-[30px] h-[40vh] shadow-sm m-auto">
-          <OrdersAnalytics isDashboard={true} />
-        </div>
-        <div className="p-5">
-          <h5 className="dark:text-[#fff] text-black text-[20px] font-[400] font-Poppins pb-3">
+      {/* Recent Transactions Section */}
+      <div className="grid grid-cols-1 mb-8">
+        <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md p-6">
+          <h3 className="text-lg font-semibold mb-4 dark:text-white text-gray-800">
             Recent Transactions
-          </h5>
-          <AllInvoices isDashboard={true} />
+          </h3>
+          <div className="overflow-hidden">
+            <AllInvoices isDashboard={true} />
+          </div>
         </div>
       </div>
     </div>

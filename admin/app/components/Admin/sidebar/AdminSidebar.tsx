@@ -17,14 +17,12 @@ import {
   QuizIcon,
   WysiwygIcon,
   ManageHistoryIcon,
-  SettingsIcon,
   ExitToAppIcon,
 } from "./Icon";
-import avatarDefault from "../../../../public/assests/avatar.png";
-import { useSelector } from "react-redux";
 import Link from "next/link";
-import Image from "next/image";
 import { useTheme } from "next-themes";
+import { useSelector } from "react-redux";
+import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
 interface itemProps {
@@ -36,45 +34,77 @@ interface itemProps {
 }
 
 const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected }) => {
-  // Use MenuItem's onClick for navigation instead of nesting <Link>
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    window.location.href = to;
-  };
+  const router = useRouter();
+  const isActive = selected === title;
+
   return (
-    <MenuItem
-      active={selected === title}
-      onClick={(e) => {
+    <div 
+      className="cursor-pointer"
+      onClick={() => {
         setSelected(title);
-        handleClick(e);
+        router.push(to);
       }}
-      icon={icon}
-      className="hover:!bg-[unset]"
     >
-      <span className="hover:!bg-[unset] cursor-pointer">
-        <Typography className="!text-[16px] !font-Poppins text-black dark:text-white">
+      <MenuItem
+        active={isActive}
+        icon={icon}
+        className="hover:!bg-[#f0f0f0] dark:hover:!bg-[#1e2a47] transition-all duration-200 my-1"
+        style={{
+          borderRadius: "8px",
+        }}
+      >
+        <Typography className="!text-[15px] !font-medium text-black dark:text-white">
           {title}
         </Typography>
-      </span>
-    </MenuItem>
+      </MenuItem>
+    </div>
   );
 };
 
 const AdminSidebar = () => {
   const { user } = useSelector((state: any) => state.auth);
-  const [logout, setlogout] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
+  const pathname = usePathname();
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    
+    // Set selected based on pathname
+    if (pathname === "/admin") {
+      setSelected("Dashboard");
+    } else if (pathname === "/admin/users") {
+      setSelected("Users");
+    } else if (pathname === "/admin/invoices") {
+      setSelected("Invoices");
+    } else if (pathname === "/admin/create-course") {
+      setSelected("Create Course");
+    } else if (pathname === "/admin/courses") {
+      setSelected("Live Courses");
+    } else if (pathname === "/admin/hero") {
+      setSelected("Hero");
+    } else if (pathname === "/admin/faq") {
+      setSelected("FAQ");
+    } else if (pathname === "/admin/categories") {
+      setSelected("Categories");
+    } else if (pathname === "/admin/team") {
+      setSelected("Manage Team");
+    } else if (pathname === "/admin/courses-analytics") {
+      setSelected("Courses Analytics");
+    } else if (pathname === "/admin/orders-analytics") {
+      setSelected("Orders Analytics");
+    } else if (pathname === "/admin/users-analytics") {
+      setSelected("Users Analytics");
+    }
+  }, [pathname]);
 
   if (!mounted) {
     return null;
   }
 
-  const logoutHandler = async () => {
+  const logoutHandler = () => {
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
     window.location.reload();
@@ -83,48 +113,51 @@ const AdminSidebar = () => {
   return (
     <Box
       sx={{
-        "& .pro-sidebar-inner": {
-          background: `${
-            theme === "dark" ? "#111C43 !important" : "#fff !important"
-          }`,
+        "& .ps-sidebar-root": {
+          border: "none !important",
         },
-        "& .pro-icon-wrapper": {
-          backgroundColor: "transparent !important",
+        "& .ps-menu-button": {
+          padding: "8px 16px !important",
         },
-        "& .pro-inner-item:hover": {
-          color: "#868dfb !important",
+        "& .ps-menu-button:hover": {
+          backgroundColor: theme === "dark" ? "#1e2a47 !important" : "#f0f0f0 !important",
         },
-        "& .pro-menu-item.active": {
-          color: "#6870fa !important",
-        },
-        "& .pro-inner-item": {
-          padding: "5px 35px 5px 20px !important",
-          opacity: 1,
-        },
-        "& .pro-menu-item": {
-          color: `${theme !== "dark" && "#000"}`,
-        },
+        "& .ps-menu-button.ps-active": {
+          backgroundColor: theme === "dark" ? "#1e2a47 !important" : "#f0f0f0 !important",
+          borderRight: "4px solid #3ccba0 !important",
+        }
       }}
       className="!bg-white dark:bg-[#111C43]"
     >
       <Sidebar
         collapsed={isCollapsed}
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
+          position: "relative", /* Changed to relative since parent is now fixed */
           height: "100vh",
-          zIndex: 99999999999999,
-          width: isCollapsed ? "0%" : "16%",
+          width: isCollapsed ? "0%" : "100%",
+          backgroundColor: theme === "dark" ? "#111C43" : "white",
+          border: "none",
+          boxShadow: theme === "dark" 
+            ? "0 0 10px rgba(0,0,0,0.5)" 
+            : "0 0 10px rgba(0,0,0,0.1)",
         }}
+        className="!border-r-0"
       >
-        <Menu>
+        <Menu 
+          menuItemStyles={{
+            button: {
+              "&:hover": {
+                backgroundColor: theme === "dark" ? "#1e2a47" : "#f0f0f0",
+              },
+            },
+          }}
+        >
           {/* LOGO AND MENU ICON */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <ArrowForwardIosIcon /> : undefined}
             style={{
-              margin: "10px 0 20px 0",
+              margin: "30px 0 26px 0", // Increased top margin for better spacing
             }}
           >
             {!isCollapsed && (
@@ -134,15 +167,14 @@ const AdminSidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                {/* Fix: Do not nest <Link> inside another <a> */}
                 <span className="block">
-                  <h3 className="text-[25px] font-Poppins uppercase dark:text-white text-black">
+                  <h3 className="text-[22px] font-bold uppercase dark:text-white text-black">
                     ThinkCyber
                   </h3>
                 </span>
                 <IconButton
                   onClick={() => setIsCollapsed(!isCollapsed)}
-                  className="inline-block"
+                  className="inline-block hover:bg-gray-100 dark:hover:bg-[#1e2a47]"
                 >
                   <ArrowBackIosIcon className="text-black dark:text-[#ffffffc1]" />
                 </IconButton>
@@ -150,13 +182,7 @@ const AdminSidebar = () => {
             )}
           </MenuItem>
 
-          {!isCollapsed && (
-            <Box mb="25px"> 
-              <Box textAlign="center"> 
-                 
-              </Box>
-            </Box>
-          )}
+          {/* User profile section removed */}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
@@ -168,9 +194,9 @@ const AdminSidebar = () => {
             />
 
             <Typography
-              variant="h5"
-              sx={{ m: "15px 0 5px 25px" }}
-              className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
+              variant="h6"
+              sx={{ m: "24px 0 10px 25px" }}
+              className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
             >
               {!isCollapsed && "Data"}
             </Typography>
@@ -193,9 +219,9 @@ const AdminSidebar = () => {
             />
 
             <Typography
-              variant="h5"
-              className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-              sx={{ m: "15px 0 5px 20px" }}
+              variant="h6"
+              className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
+              sx={{ m: "24px 0 10px 25px" }}
             >
               {!isCollapsed && "Content"}
             </Typography>
@@ -217,9 +243,9 @@ const AdminSidebar = () => {
             />
 
             <Typography
-              variant="h5"
-              className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-              sx={{ m: "15px 0 5px 20px" }}
+              variant="h6"
+              className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
+              sx={{ m: "24px 0 10px 25px" }}
             >
               {!isCollapsed && "Customization"}
             </Typography>
@@ -246,9 +272,9 @@ const AdminSidebar = () => {
             />
 
             <Typography
-              variant="h5"
-              className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-              sx={{ m: "15px 0 5px 20px" }}
+              variant="h6"
+              className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
+              sx={{ m: "24px 0 10px 25px" }}
             >
               {!isCollapsed && "Controllers"}
             </Typography>
@@ -264,8 +290,8 @@ const AdminSidebar = () => {
 
             <Typography
               variant="h6"
-              className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-              sx={{ m: "15px 0 5px 20px" }}
+              className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
+              sx={{ m: "24px 0 10px 25px" }}
             >
               {!isCollapsed && "Analytics"}
             </Typography>
@@ -298,19 +324,26 @@ const AdminSidebar = () => {
 
             <Typography
               variant="h6"
-              className="!text-[18px] text-black dark:text-[#ffffffc1] capitalize !font-[400]"
-              sx={{ m: "15px 0 5px 20px" }}
+              className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
+              sx={{ m: "24px 0 10px 25px" }}
             >
-              {!isCollapsed && "Extras"}
+              {!isCollapsed && "Account"}
             </Typography>
             <div onClick={logoutHandler}>
-              <Item
-                title="Logout"
-                to="/"
-                icon={<ExitToAppIcon className="text-black dark:text-white" />}
-                selected={selected}
-                setSelected={setSelected}
-              />
+              <MenuItem
+                active={false}
+                icon={<ExitToAppIcon className="text-red-500" />}
+                className="hover:!bg-[#f0f0f0] dark:hover:!bg-[#1e2a47] transition-all duration-200 my-1"
+                style={{
+                  borderRadius: "8px",
+                  marginLeft: isCollapsed ? undefined : "10%",
+                  marginRight: "10%",
+                }}
+              >
+                <Typography className="!text-[15px] !font-medium text-red-500">
+                  Logout
+                </Typography>
+              </MenuItem>
             </div>
           </Box>
         </Menu>

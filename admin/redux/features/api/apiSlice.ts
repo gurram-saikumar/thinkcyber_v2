@@ -40,7 +40,7 @@ export const apiSlice = createApi({
             })
           );
         } catch (err) {
-          console.error("Error loading user:", JSON.stringify(err, null, 2));
+          //console.error("Error loading user:", JSON.stringify(err, null, 2));
         }
       },
     }),

@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Button, Modal } from "@mui/material";
 import { AiOutlineDelete, AiOutlineMail } from "react-icons/ai";
 import { useTheme } from "next-themes";
@@ -17,7 +17,7 @@ type Props = {
   isTeam?: boolean;
 };
 
-const AllCourses: FC<Props> = ({ isTeam }) => {
+const AllUsers: FC<Props> = ({ isTeam }) => {
   const { theme, setTheme } = useTheme();
   const [active, setActive] = useState(false);
   const [email, setEmail] = useState("");
@@ -59,7 +59,7 @@ const AllCourses: FC<Props> = ({ isTeam }) => {
     }
   }, [updateError, isSuccess, deleteSuccess, deleteError]);
 
-  const columns = [
+  const columns: GridColDef[] = [
     { field: "id", headerName: "ID", flex: 0.3 },
     { field: "name", headerName: "Name", flex: 0.5 },
     { field: "email", headerName: "Email", flex: 0.5 },
@@ -67,38 +67,40 @@ const AllCourses: FC<Props> = ({ isTeam }) => {
     { field: "courses", headerName: "Purchased Courses", flex: 0.5 },
     { field: "created_at", headerName: "Joined At", flex: 0.5 },
     {
-      field: " ",
+      field: "delete",
       headerName: "Delete",
       flex: 0.2,
-      renderCell: (params: any) => {
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => {
         return (
-          <>
-            <Button
-              onClick={() => {
-                setOpen(!open);
-                setUserId(params.row.id);
-              }}
-            >
-              <AiOutlineDelete
-                className="dark:text-white text-black"
-                size={20}
-              />
-            </Button>
-          </>
+          <Button
+            onClick={() => {
+              setOpen(!open);
+              setUserId(params.row.id);
+            }}
+          >
+            <AiOutlineDelete
+              className="dark:text-white text-black"
+              size={20}
+            />
+          </Button>
         );
       },
     },
     {
-      field: "  ",
+      field: "email_action",
       headerName: "Email",
       flex: 0.2,
-      renderCell: (params: any) => {
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => {
         return (
-          <>
-            <a href={`mailto:${params.row.email}`}>
-              <AiOutlineMail className="dark:text-white text-black" size={20} />
-            </a>
-          </>
+          <a href={`mailto:${params.row.email}`}>
+            <AiOutlineMail className="dark:text-white text-black" size={20} />
+          </a>
         );
       },
     },
@@ -212,7 +214,30 @@ const AllCourses: FC<Props> = ({ isTeam }) => {
               },
             }}
           >
-            <DataGrid checkboxSelection rows={rows} columns={columns} />
+            <DataGrid 
+              rows={rows} 
+              columns={columns}
+              disableRowSelectionOnClick
+              initialState={{
+                pagination: { 
+                  paginationModel: { pageSize: 10 } 
+                },
+              }}
+              pageSizeOptions={[5, 10, 25]}
+              getRowId={(row) => row.id}
+              checkboxSelection={false}
+              autoHeight
+              disableColumnSelector
+              density="standard"
+              loading={isLoading}
+              components={{
+                NoRowsOverlay: () => (
+                  <div className="flex justify-center items-center h-full">
+                    <p className="text-gray-500 dark:text-gray-400">No users found</p>
+                  </div>
+                ),
+              }}
+            />
           </Box>
           {active && (
             <Modal
@@ -286,4 +311,4 @@ const AllCourses: FC<Props> = ({ isTeam }) => {
   );
 };
 
-export default AllCourses;
+export default AllUsers;
