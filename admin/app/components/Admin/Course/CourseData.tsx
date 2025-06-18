@@ -24,8 +24,13 @@ const CourseData: FC<Props> = ({
 }) => {
 
   const handleBenefitChange = (index: number, value: any) => {
-    const updatedBenefits = [...benefits];
-    updatedBenefits[index].title = value;
+    // Create deep copies of both the array and each object inside it
+    const updatedBenefits = benefits.map((benefit, i) => {
+      if (i === index) {
+        return { ...benefit, title: value };
+      }
+      return { ...benefit };
+    });
     setBenefits(updatedBenefits);
   };
 
@@ -34,8 +39,13 @@ const CourseData: FC<Props> = ({
   };
 
   const handlePrerequisitesChange = (index: number, value: any) => {
-    const updatedPrerequisites = [...prerequisites];
-    updatedPrerequisites[index].title = value;
+    // Create deep copies of both the array and each object inside it
+    const updatedPrerequisites = prerequisites.map((prerequisite, i) => {
+      if (i === index) {
+        return { ...prerequisite, title: value };
+      }
+      return { ...prerequisite };
+    });
     setPrerequisites(updatedPrerequisites);
   };
 

@@ -16,6 +16,11 @@ export const coursesApi = apiSlice.injectEndpoints({
         method: "GET",
         credentials: "include" as const,
       }),
+      // Add transform response to include debug info
+      transformResponse: (response: any) => {
+        console.log("API Response:", response);
+        return response;
+      },
     }),
     deleteCourse: builder.mutation({
       query: (id) => ({
@@ -25,12 +30,45 @@ export const coursesApi = apiSlice.injectEndpoints({
       }),
     }),
     editCourse: builder.mutation({
-      query: ({ id: courseId, data }) => ({
-        url: `edit-course/${courseId}`,
-        method: "PUT",
-        body: data,
-        credentials: "include" as const,
-      }),
+      query: ({ id: courseId, data }) => {
+        console.log("Making edit course request with ID:", courseId);
+        return {
+          url: `edit-course/${encodeURIComponent(courseId)}`,
+          method: "PUT",
+          body: data,
+          credentials: "include" as const,
+        };
+      },
+      // Add response transformation for better error handling
+      transformResponse: (response: any, meta, arg) => {
+        console.log("Edit course response:", response);
+        console.log("Edit course response meta:", meta);
+        return response;
+      },
+      transformErrorResponse: (response: any, meta, arg) => {
+        console.error("Edit course error response:", response);
+        console.error("Edit course error meta:", meta);
+        console.error("Edit course error args:", arg);
+        
+        // Try to get more meaningful error information
+        let enhancedError = { ...response };
+        
+        try {
+          if (response.status) {
+            enhancedError.statusText = `HTTP Error: ${response.status}`;
+          }
+          
+          if (response.data) {
+            enhancedError.message = typeof response.data === 'object' 
+              ? response.data.message || JSON.stringify(response.data)
+              : String(response.data);
+          }
+        } catch (e) {
+          console.error("Error enhancing error response:", e);
+        }
+        
+        return enhancedError;
+      },
     }),
     getUsersAllCourses: builder.query({
       query: () => ({
@@ -40,11 +78,44 @@ export const coursesApi = apiSlice.injectEndpoints({
       }),
     }),
     getCourseDetails: builder.query({
-      query: (id: any) => ({
-        url: `get-course/${id}`,
-        method: "GET",
-        credentials: "include" as const,
-      }),
+      query: (id: any) => {
+        // Safely encode the ID, handling potential special characters
+        console.log("Fetching course details for ID:", id);
+        
+        // Make sure we have a valid ID
+        if (!id) {
+          console.error("Invalid course ID provided:", id);
+          throw new Error("Invalid course ID");
+        }
+        
+        // Try to normalize the ID (handle both encoded and non-encoded IDs)
+        let normalizedId;
+        try {
+          // First try to decode in case it's already encoded
+          const decodedId = decodeURIComponent(id);
+          // Then encode it properly for the URL
+          normalizedId = encodeURIComponent(decodedId);
+        } catch (e) {
+          // If there's an error in decoding, just encode the original
+          normalizedId = encodeURIComponent(id);
+        }
+        
+        console.log("Normalized course ID for API request:", normalizedId);
+        
+        return {
+          url: `get-course/${normalizedId}`,
+          method: "GET",
+          credentials: "include" as const,
+        };
+      },
+      transformResponse: (response: any) => {
+        console.log("Course details API response:", response);
+        return response;
+      },
+      transformErrorResponse: (response: any) => {
+        console.error("Course details API error:", response);
+        return response;
+      },
     }),
     getCourseContent: builder.query({
       query: (id) => ({

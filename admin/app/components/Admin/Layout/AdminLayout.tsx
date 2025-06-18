@@ -24,7 +24,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <AdminHeader open={open} setOpen={setOpen} />
         </header>
         
-        <main className="flex-grow overflow-auto pt-4">
+        <main className="flex-grow overflow-auto">
           {children}
         </main>
       </div>

@@ -30,7 +30,18 @@ export const uploadCourse = async (req: Request, res: Response, next: NextFuncti
       };
     }
 
+    // Ensure estimatedPrice is set
+    if (data.estimatedPrice === undefined || data.estimatedPrice === null) {
+      data.estimatedPrice = "";
+    }
+
     data.userId = req.user?.id;
+    
+    console.log("Creating course with data:", {
+      ...data,
+      estimatedPrice: data.estimatedPrice,
+      thumbnail: data.thumbnail ? 'thumbnail present' : 'no thumbnail'
+    });
 
     const course = await Course.create(data);
 
@@ -47,15 +58,52 @@ export const editCourse = async (req: Request, res: Response, next: NextFunction
   try {
     const data = req.body;
     const thumbnail = data.thumbnail;
-    const courseId = req.params.id;
-
-    const course = await Course.findByPk(courseId);
-
+    const courseIdParam = req.params.id;
+    
+    console.log("Edit course request received for ID:", courseIdParam);
+    
+    // Try to decode the ID in case it's URL encoded
+    let courseId;
+    try {
+      courseId = decodeURIComponent(courseIdParam);
+    } catch (e) {
+      courseId = courseIdParam;
+    }
+    
+    console.log("Looking for course to edit with ID:", courseId);
+    
+    // First try finding by primary key
+    let course = await Course.findByPk(courseId);
+    
+    // If not found, try alternate ways to find the course
     if (!course) {
-      return next(new ErrorHandler("Course not found", 404));
+      console.log("Course not found by primary key, trying alternative lookups");
+      
+      // Try finding by name (for user-friendly URLs)
+      course = await Course.findOne({
+        where: { name: courseId }
+      });
+      
+      // If still not found, try finding by demoUrl
+      if (!course) {
+        course = await Course.findOne({
+          where: { demoUrl: courseId }
+        });
+      }
     }
 
-    if (thumbnail && !thumbnail.startsWith("https")) {
+    if (!course) {
+      console.log("Course not found after all lookup attempts");
+      return next(new ErrorHandler(`Course not found with ID or name: ${courseId}`, 404));
+    }
+
+    console.log("Course found for editing:", course.id);
+
+    if (thumbnail && thumbnail.public_id && thumbnail.url) {
+      // Thumbnail is already a cloudinary object, no need to re-upload
+      console.log("Using existing thumbnail");
+    } else if (thumbnail && !thumbnail.startsWith("https")) {
+      console.log("Uploading new thumbnail to cloudinary");
       await cloudinary.uploader.destroy(course.thumbnail.public_id);
 
       const myCloud = await cloudinary.uploader.upload(thumbnail, {
@@ -68,33 +116,98 @@ export const editCourse = async (req: Request, res: Response, next: NextFunction
       };
     }
 
+    console.log("Updating course with data", JSON.stringify({
+      ...data, 
+      estimatedPrice: data.estimatedPrice || "",
+      _id: data._id,
+      id: data.id
+    }, null, 2).substring(0, 300) + "...");
+    
+    // Ensure estimatedPrice is included and properly formatted
+    if (data.estimatedPrice === undefined || data.estimatedPrice === null) {
+      data.estimatedPrice = "";
+    }
+    
     const updatedCourse = await course.update(data);
 
+    console.log("Course updated successfully");
     res.status(200).json({
       success: true,
       course: updatedCourse,
     });
   } catch (error: any) {
-    next(new ErrorHandler(error.message, 500));
+    console.error("Error in editCourse:", error);
+    // Provide more detailed error information
+    let errorMessage = "Error updating course";
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      console.error("Error details:", {
+        name: error.name,
+        stack: error.stack
+      });
+    } else if (typeof error === 'object' && error !== null) {
+      console.error("Error details:", error);
+    }
+    
+    // Add details to the message for better client-side debugging
+    next(new ErrorHandler(`${errorMessage} (See server logs for details)`, 500));
   }
 };
 
 export const getSingleCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const courseId = req.params.id;
-    const course = await Course.findByPk(courseId, {
+    const courseIdParam = req.params.id;
+    console.log("Received course ID param:", courseIdParam);
+    
+    // Try to decode the ID in case it's URL encoded
+    let courseId;
+    try {
+      courseId = decodeURIComponent(courseIdParam);
+    } catch (e) {
+      courseId = courseIdParam;
+    }
+    
+    console.log("Looking for course with ID:", courseId);
+    
+    // First try finding by primary key
+    let course = await Course.findByPk(courseId, {
       attributes: { exclude: ['courseData.videoUrl', 'courseData.suggestion', 'courseData.questions', 'courseData.links'] }
     });
-
+    
+    // If not found, try alternate ways to find the course
     if (!course) {
-      return next(new ErrorHandler("Course not found", 404));
+      console.log("Course not found by primary key, trying alternative lookups");
+      
+      // Try finding by name (for user-friendly URLs)
+      course = await Course.findOne({
+        where: { name: courseId },
+        attributes: { exclude: ['courseData.videoUrl', 'courseData.suggestion', 'courseData.questions', 'courseData.links'] }
+      });
+      
+      // If still not found, try finding by demoUrl
+      if (!course) {
+        course = await Course.findOne({
+          where: { demoUrl: courseId },
+          attributes: { exclude: ['courseData.videoUrl', 'courseData.suggestion', 'courseData.questions', 'courseData.links'] }
+        });
+      }
     }
 
+    if (!course) {
+      console.log("Course not found after all lookup attempts");
+      return next(new ErrorHandler(`Course not found with ID or name: ${courseId}`, 404));
+    }
+
+    console.log("Course found:", course.id);
+    console.log("Course estimatedPrice:", course.estimatedPrice);
+    
     res.status(200).json({
       success: true,
       course,
     });
   } catch (error: any) {
+    console.error("Error in getSingleCourse:", error);
     next(new ErrorHandler(error.message, 500));
   }
 };

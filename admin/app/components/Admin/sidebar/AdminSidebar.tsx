@@ -331,29 +331,7 @@ const AdminSidebar = () => {
               setSelected={setSelected}
             />
 
-            <Typography
-              variant="h6"
-              className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
-              sx={{ m: "24px 0 10px 25px" }}
-            >
-              {!isCollapsed && "Account"}
-            </Typography>
-            <div onClick={logoutHandler}>
-              <MenuItem
-                active={false}
-                icon={<ExitToAppIcon className="text-red-500" />}
-                className="hover:!bg-[#f0f0f0] dark:hover:!bg-[#1e2a47] transition-all duration-200 my-1"
-                style={{
-                  borderRadius: "8px",
-                  marginLeft: isCollapsed ? undefined : "10%",
-                  marginRight: "10%",
-                }}
-              >
-                <Typography className="!text-[15px] !font-medium text-red-500">
-                  Logout
-                </Typography>
-              </MenuItem>
-            </div>
+         
           </Box>
         </Menu>
       </Sidebar>

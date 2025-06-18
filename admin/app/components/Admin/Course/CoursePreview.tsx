@@ -40,14 +40,45 @@ const CoursePreview: FC<Props> = ({
 
     if (isEdit) {
       console.log("Update button clicked");
+      console.log("Course data for update:", courseData);
 
+      // Try to get the course ID from various possible sources
       const courseId = courseData?._id || courseData?.id;
+      
       if (!courseId) {
-        console.error("Course ID is missing.");
-        toast.error("Course ID is missing. Cannot update course.");
+        // Detailed error logging for debugging
+        console.error("Course ID is missing. Course data:", JSON.stringify(courseData, null, 2));
+        console.error("Course data type:", typeof courseData);
+        console.error("Course data keys:", Object.keys(courseData || {}));
+        
+        // Show user-friendly error with troubleshooting info
+        toast.error("Course ID is missing. Cannot update course. Please reload the page and try again.");
+        
+        // Try to recover by finding the ID in the URL
+        const urlPath = window.location.pathname;
+        const urlIdMatch = urlPath.match(/edit-course\/([^/]+)/);
+        
+        if (urlIdMatch && urlIdMatch[1]) {
+          console.log("Attempting to recover ID from URL:", urlIdMatch[1]);
+          const recoveredId = decodeURIComponent(urlIdMatch[1]);
+          console.log("Recovered ID:", recoveredId);
+          
+          // Call handle course create with the recovered ID if possible
+          try {
+            if (typeof handleCourseCreate === 'function') {
+              console.log("Attempting to update course with recovered ID");
+              handleCourseCreate(e, recoveredId);
+              return;
+            }
+          } catch (recoveryErr) {
+            console.error("Recovery attempt failed:", recoveryErr);
+          }
+        }
+        
         return;
       }
 
+      console.log("Proceeding with course update. ID:", courseId);
       try {
         handleCourseCreate(e);
       } catch (err) {

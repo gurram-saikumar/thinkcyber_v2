@@ -62,7 +62,21 @@ const CourseInformation: FC<Props> = ({
 
       reader.onload = (e: any) => {
         if (reader.readyState === 2) {
-          setCourseInfo({ ...courseInfo, thumbnail: reader.result });
+          // If thumbnail was an object with url, preserve the object structure for the server
+          if (typeof courseInfo.thumbnail === 'object' && courseInfo.thumbnail !== null && 'public_id' in courseInfo.thumbnail) {
+            console.log("Preserving thumbnail object structure while updating image");
+            setCourseInfo({ 
+              ...courseInfo, 
+              thumbnail: {
+                ...courseInfo.thumbnail,
+                tempPreview: reader.result, // Add temporary preview
+                _changed: true // Flag to indicate the image was changed
+              } 
+            });
+          } else {
+            // Otherwise just set the raw base64 data
+            setCourseInfo({ ...courseInfo, thumbnail: reader.result });
+          }
         }
       };
       reader.readAsDataURL(file);
@@ -89,11 +103,43 @@ const CourseInformation: FC<Props> = ({
       const reader = new FileReader();
 
       reader.onload = () => {
-        setCourseInfo({ ...courseInfo, thumbnail: reader.result });
+        // If thumbnail was an object with url, preserve the object structure for the server
+        if (typeof courseInfo.thumbnail === 'object' && courseInfo.thumbnail !== null && 'public_id' in courseInfo.thumbnail) {
+          console.log("Preserving thumbnail object structure while updating image (drop)");
+          setCourseInfo({ 
+            ...courseInfo, 
+            thumbnail: {
+              ...courseInfo.thumbnail,
+              tempPreview: reader.result, // Add temporary preview
+              _changed: true // Flag to indicate the image was changed
+            } 
+          });
+        } else {
+          // Otherwise just set the raw base64 data
+          setCourseInfo({ ...courseInfo, thumbnail: reader.result });
+        }
       };
       reader.readAsDataURL(file);
     }
   };
+
+  // Add debugging for course info data
+  useEffect(() => {
+    console.log("CourseInformation component courseInfo:", courseInfo);
+    console.log("CourseInformation estimatedPrice:", courseInfo.estimatedPrice);
+  }, [courseInfo]);
+
+  // Add debugging for thumbnail data
+  useEffect(() => {
+    if (courseInfo.thumbnail) {
+      console.log("Thumbnail data:", courseInfo.thumbnail);
+      console.log("Thumbnail type:", typeof courseInfo.thumbnail);
+      if (typeof courseInfo.thumbnail === 'object') {
+        console.log("Thumbnail URL:", courseInfo.thumbnail.url);
+        console.log("Thumbnail public_id:", courseInfo.thumbnail.public_id);
+      }
+    }
+  }, [courseInfo.thumbnail]);
 
   // Animation variants
   const containerVariant = {
@@ -185,11 +231,11 @@ const CourseInformation: FC<Props> = ({
             <input
               type="number"
               name=""
-              value={courseInfo.estimatedPrice}
+              value={courseInfo.estimatedPrice || ""}
               onChange={(e: any) =>
                 setCourseInfo({ ...courseInfo, estimatedPrice: e.target.value })
               }
-              id="price"
+              id="estimatedPrice"
               placeholder="79"
               className={`${styles.input} transition-all focus:border-blue-500 focus:ring focus:ring-blue-200`}
             />
@@ -326,14 +372,23 @@ const CourseInformation: FC<Props> = ({
             onDrop={handleDrop}
           >
             {courseInfo.thumbnail ? (
-              <motion.img
-                src={courseInfo.thumbnail}
-                alt="Thumbnail preview"
-                className="max-h-full w-full object-contain rounded-md"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              />
+              <motion.div className="relative w-full h-full flex items-center justify-center">
+                <motion.img
+                  src={
+                    typeof courseInfo.thumbnail === 'object' 
+                      ? courseInfo.thumbnail.tempPreview || courseInfo.thumbnail.url 
+                      : courseInfo.thumbnail
+                  }
+                  alt="Thumbnail preview"
+                  className="max-h-[200px] w-auto object-contain rounded-md shadow-md"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs py-1 px-2 text-center rounded-b-md">
+                  Click or drag to change thumbnail
+                </div>
+              </motion.div>
             ) : (
               <motion.div 
                 className="text-center"

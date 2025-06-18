@@ -10,11 +10,22 @@ import { motion } from "framer-motion";
 
 type Props = {};
 
-const page = ({ params }: any) => {
-  const { id } = params; // <-- unwrap params
+const page = ({ params }: { params: { id: string } }) => {
+  // In Next.js, params may be a Promise, so we should use React.use()
+  // However, for proper typing, we can cast it as needed
+  const { id } = React.use(params as any);
   const [active, setActive] = React.useState(0);
+  
+  // Ensure ID is properly decoded for URLs with special characters
+  const decodedId = id ? decodeURIComponent(id) : "";
+  
+  // Debug information
+  React.useEffect(() => {
+    console.log("Edit course page ID:", id);
+    console.log("Decoded ID:", decodedId);
+  }, [id, decodedId]);
 
-  if (!id)
+  if (!decodedId)
     return (
       <div className="flex items-center justify-center h-screen">
         <motion.div
@@ -30,22 +41,15 @@ const page = ({ params }: any) => {
 
   return (
     <div>
-      <Heading
-        title="ThinkCyber - Admin"
-        description="ThinkCyber is a platform for students to learn and get help from teachers"
-        keywords="Programming,MERN,Redux,Machine Learning"
-      />
+       
       <div className="flex">
-        <div className="1500px:w-[16%] w-1/5">
-          <AdminSidebar />
-        </div>
+        
         <motion.div
-          className="w-[85%]"
+          className="w-full"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-        >
-          <DashboardHeader />
+        > 
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -93,7 +97,7 @@ const page = ({ params }: any) => {
                 className="w-full"
               >
                 <EditCourse
-                  id={id}
+                  id={decodedId}
                   activeStep={active}
                   setActiveStep={setActive}
                 />

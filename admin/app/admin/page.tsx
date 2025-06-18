@@ -5,15 +5,7 @@ import { Box, Typography } from "@mui/material";
 
 export default function AdminPage() {
   return (
-    <div className="p-4">
-      <Box mb={4}>
-        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-          Dashboard Overview
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Welcome to the ThinkCyber admin dashboard
-        </Typography>
-      </Box>
+    <div className="p-4"> 
       <DashboardHero isDashboard={true} />
     </div>
   );

@@ -13,36 +13,36 @@ import {
 } from "recharts";
 import Loader from "../../Loader/Loader";
 
-// const analyticsData = [
-//   {
-//     name: "Page A",
-//     Count: 4000,
-//   },
-//   {
-//     name: "Page B",
-//     Count: 3000,
-//   },
-//   {
-//     name: "Page C",
-//     Count: 5000,
-//   },
-//   {
-//     name: "Page D",
-//     Count: 1000,
-//   },
-//   {
-//     name: "Page E",
-//     Count: 4000,
-//   },
-//   {
-//     name: "Page F",
-//     Count: 800,
-//   },
-//   {
-//     name: "Page G",
-//     Count: 200,
-//   },
-// ];
+const analyticsData = [
+  {
+    name: "Page A",
+    Count: 4000,
+  },
+  {
+    name: "Page B",
+    Count: 3000,
+  },
+  {
+    name: "Page C",
+    Count: 5000,
+  },
+  {
+    name: "Page D",
+    Count: 1000,
+  },
+  {
+    name: "Page E",
+    Count: 4000,
+  },
+  {
+    name: "Page F",
+    Count: 800,
+  },
+  {
+    name: "Page G",
+    Count: 200,
+  },
+];
 
 type Props = {
   isDashboard?: boolean;
@@ -74,24 +74,7 @@ export default function OrdersAnalytics({ isDashboard }: Props) {
       {isLoading ? (
         <Loader />
       ) : (
-        <div className={isDashboard ? "h-[30vh]" : "h-screen"}>
-          <div
-            className={isDashboard ? "mt-[0px] pl-[40px] mb-2" : "mt-[50px]"}
-          >
-            <h1
-              className={`${styles.title} ${
-                isDashboard && "!text-[20px]"
-              } px-5 !text-start`}
-            >
-              Orders Analytics
-            </h1>
-            {!isDashboard && (
-              <p className={`${styles.label} px-5`}>
-                Last 12 months analytics data{" "}
-              </p>
-            )}
-          </div>
-          <div
+        <div className={isDashboard ? "h-[30vh]" : "h-screen"}>           <div
             className={`w-full ${
               !isDashboard ? "h-[90%]" : "h-full"
             } flex items-center justify-center`}

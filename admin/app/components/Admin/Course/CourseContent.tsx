@@ -40,13 +40,13 @@ const CourseContent: FC<Props> = ({
   };
 
   const handleRemoveLink = (index: number, linkIndex: number) => {
-    const updatedData = [...courseContentData];
+    const updatedData = JSON.parse(JSON.stringify(courseContentData));
     updatedData[index].links.splice(linkIndex, 1);
     setCourseContentData(updatedData);
   };
 
   const handleAddLink = (index: number) => {
-    const updatedData = [...courseContentData];
+    const updatedData = JSON.parse(JSON.stringify(courseContentData));
     updatedData[index].links.push({ title: "", url: "" });
     setCourseContentData(updatedData);
   };
@@ -155,7 +155,7 @@ const CourseContent: FC<Props> = ({
                         } font-Poppins cursor-pointer dark:text-white text-black bg-transparent outline-none`}
                         value={item.videoSection}
                         onChange={(e) => {
-                          const updatedData = [...courseContentData];
+                          const updatedData = JSON.parse(JSON.stringify(courseContentData));
                           updatedData[index].videoSection = e.target.value;
                           setCourseContentData(updatedData);
                         }}
@@ -189,7 +189,7 @@ const CourseContent: FC<Props> = ({
                       }`}
                       onClick={() => {
                         if (index > 0) {
-                          const updatedData = [...courseContentData];
+                          const updatedData = JSON.parse(JSON.stringify(courseContentData));
                           updatedData.splice(index, 1);
                           setCourseContentData(updatedData);
                         }
@@ -217,7 +217,7 @@ const CourseContent: FC<Props> = ({
                         className={`${styles.input}`}
                         value={item.title}
                         onChange={(e) => {
-                          const updatedData = [...courseContentData];
+                          const updatedData = JSON.parse(JSON.stringify(courseContentData));
                           updatedData[index].title = e.target.value;
                           setCourseContentData(updatedData);
                         }}
@@ -246,7 +246,7 @@ const CourseContent: FC<Props> = ({
                                 }
                               );
                               
-                              const updatedData = [...courseContentData];
+                              const updatedData = JSON.parse(JSON.stringify(courseContentData));
                               updatedData[index].videoUrl = response.data.videoUrl;
                               setCourseContentData(updatedData);
                             } catch (error) {
@@ -269,7 +269,7 @@ const CourseContent: FC<Props> = ({
                         className={`${styles.input}`}
                         value={item.videoLength}
                         onChange={(e) => {
-                          const updatedData = [...courseContentData];
+                          const updatedData = JSON.parse(JSON.stringify(courseContentData));
                           updatedData[index].videoLength = e.target.value;
                           setCourseContentData(updatedData);
                         }}
@@ -286,7 +286,7 @@ const CourseContent: FC<Props> = ({
                         className={`${styles.input} !h-min py-2`}
                         value={item.description}
                         onChange={(e) => {
-                          const updatedData = [...courseContentData];
+                          const updatedData = JSON.parse(JSON.stringify(courseContentData));
                           updatedData[index].description = e.target.value;
                           setCourseContentData(updatedData);
                         }}
@@ -318,7 +318,7 @@ const CourseContent: FC<Props> = ({
                           className={`${styles.input}`}
                           value={link.title}
                           onChange={(e) => {
-                            const updatedData = [...courseContentData];
+                            const updatedData = JSON.parse(JSON.stringify(courseContentData));
                             updatedData[index].links[linkIndex].title =
                               e.target.value;
                             setCourseContentData(updatedData);
@@ -330,7 +330,7 @@ const CourseContent: FC<Props> = ({
                           className={`${styles.input} mt-6`}
                           value={link.url}
                           onChange={(e) => {
-                            const updatedData = [...courseContentData];
+                            const updatedData = JSON.parse(JSON.stringify(courseContentData));
                             updatedData[index].links[linkIndex].url =
                               e.target.value;
                             setCourseContentData(updatedData);

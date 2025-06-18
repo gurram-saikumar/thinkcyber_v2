@@ -10,6 +10,7 @@ interface CourseAttributes {
     categories: string;
     subcategories: string;
     price: number;
+    estimatedPrice: string;
     thumbnail: {
         public_id: string;
         url: string;
@@ -63,6 +64,7 @@ export class Course extends Model<CourseAttributes, CourseCreationAttributes> im
     public categories!: string;
     public subcategories!: string;
     public price!: number;
+    public estimatedPrice!: string;
     public thumbnail!: {
         public_id: string;
         url: string;
@@ -135,6 +137,10 @@ Course.init(
         price: {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
+        },
+        estimatedPrice: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         thumbnail: {
             type: DataTypes.TEXT,
