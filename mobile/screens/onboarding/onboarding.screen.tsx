@@ -45,7 +45,7 @@ export default function OnBoardingScreen() {
             source={require("@/assets/onboarding/shape_6.png")}
           />
           <Text style={[styles.titleText, { fontFamily: "Raleway_700Bold" }]}>
-            Becodemy
+            ThinkCyber
           </Text>
         </View>
         <View style={styles.dscpWrapper}>
