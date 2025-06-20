@@ -52,7 +52,9 @@ export const styles = StyleSheet.create({
     paddingVertical: 18,
     borderRadius: 4,
     marginTop: 40,
-  },
+    zIndex:99999,
+    position: "relative",
+   },
   buttonText: {
     color: "white",
     textAlign: "center",
