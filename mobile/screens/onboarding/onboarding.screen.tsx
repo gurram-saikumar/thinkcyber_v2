@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { styles } from "@/styles/onboarding/onboard";
 import { router } from "expo-router";
 
+// The Onboardings Fonts 
 export default function OnBoardingScreen() {
   let [fontsLoaded, fontError] = useFonts({
     Raleway_700Bold,
