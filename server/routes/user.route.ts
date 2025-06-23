@@ -112,7 +112,7 @@ router.post("/activate-user", activateUser);
  *         description: Invalid credentials
  */
 router.post("/login", loginUser);
-
+router.post("/loginEmail", loginUser)
 /**
  * @swagger
  * /api/v1/user/logout:

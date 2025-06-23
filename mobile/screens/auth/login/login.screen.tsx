@@ -34,6 +34,12 @@ import axios from "axios";
 import { SERVER_URI } from "@/utils/uri";
 import { Toast } from "react-native-toast-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoginWithEmail from "../loginEmail/loginEmail";
+
+
+
+
+
 
 export default function LoginScreen() {
   const [isPasswordVisible, setPasswordVisible] = useState(false);
@@ -131,19 +137,7 @@ return (
         {/* Login or Signup Title */}
         <Text style={styles.sectionTitle}>Log in or Sign up</Text>
 
-        {/* Social Buttons */}
-        {/* <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialButton}>
-            <FontAwesome name="google" size={20} />
-            <Text style={styles.socialText}>Google</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton}>
-            <FontAwesome name="facebook" size={20} />
-            <Text style={styles.socialText}>Facebook</Text>
-          </TouchableOpacity>
-        </View> */}
-
-        {/* SSO */}
+        {/* Google Botton */}
         <TouchableOpacity style={styles.ssoButton}>
           <SimpleLineIcons name="organization" size={16} style={{ marginRight: 6 }} />
           <Text style={styles.ssoText}>Google</Text>
@@ -152,7 +146,7 @@ return (
         {/* Login with Email */}
         <TouchableOpacity
           style={styles.emailButton}
-          onPress={() => router.push("/(routes)/sign-in-email")}
+          onPress={() => router.push("/(routes)/loginEmail")}
         >
           <Text style={styles.emailText}>Log in with Email</Text>
         </TouchableOpacity>
