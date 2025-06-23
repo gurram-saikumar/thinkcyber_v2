@@ -3,6 +3,8 @@ import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
 import React, { FC, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FiUploadCloud } from "react-icons/fi";
+import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
+
 
 type Props = {
   courseInfo: any;
@@ -333,19 +335,21 @@ const CourseInformation: FC<Props> = ({
         
         <motion.div className="w-full flex justify-between flex-wrap" variants={itemVariant}>
           <div className="w-full md:w-[45%] mb-5">
-            <label className={`text-gray-700 dark:text-gray-200 font-medium`}>Demo Url</label>
-            <input
-              type="text"
-              name=""
+            <label className={`text-gray-700 dark:text-gray-200 font-medium`}>Language </label>
+            <select
               required
-              value={courseInfo.demoUrl}
+              value={courseInfo.language || ""}
               onChange={(e: any) =>
-                setCourseInfo({ ...courseInfo, demoUrl: e.target.value })
+                setCourseInfo({ ...courseInfo, language: e.target.value })
               }
-              id="demoUrl"
-              placeholder="eer74fd"
+              id="language"
               className={`${styles.input} transition-all focus:border-blue-500 focus:ring focus:ring-blue-200`}
-            />
+            >
+              <option value="">Select Language</option>
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Telugu">Telugu</option>
+            </select>
           </div>
           <div className="w-full md:w-[45%] mb-5">
             {/* Empty div for layout balance */}
