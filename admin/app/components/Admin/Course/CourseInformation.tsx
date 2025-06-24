@@ -3,8 +3,7 @@ import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
 import React, { FC, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FiUploadCloud } from "react-icons/fi";
-import { DropDownListComponent } from '@syncfusion/ej2-react-dropdowns';
-
+import TextEditor from "../../textEditor/textEditor";
 
 type Props = {
   courseInfo: any;
@@ -27,6 +26,12 @@ const CourseInformation: FC<Props> = ({
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [filteredSubcategories, setFilteredSubcategories] = useState([]);
+  const [post, setPost] = useState("");
+
+  const onChange = (content: React.SetStateAction<string>) => {
+    setPost(content);
+    console.log(content);
+  }
 
   useEffect(() => {
     if (categoriesData?.layout?.categories) {
@@ -196,7 +201,11 @@ const CourseInformation: FC<Props> = ({
         
         <motion.div className="mb-5 mt-5" variants={itemVariant}>
           <label className={`text-gray-700 dark:text-gray-200 font-medium`}>Course Description</label>
-          <textarea
+          <div className="max-w-5xl mx-auto py-8">
+            <TextEditor content={post} onChange={onChange} />
+          </div>
+        
+          {/* <textarea
             name=""
             id=""
             cols={30}
@@ -207,7 +216,7 @@ const CourseInformation: FC<Props> = ({
             onChange={(e: any) =>
               setCourseInfo({ ...courseInfo, description: e.target.value })
             }
-          ></textarea>
+          ></textarea> */}
         </motion.div>
         
         <motion.div className="w-full flex justify-between flex-wrap" variants={itemVariant}>
