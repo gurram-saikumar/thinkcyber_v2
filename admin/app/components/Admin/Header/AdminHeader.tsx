@@ -17,8 +17,8 @@ const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 type Props = {
-  open?: boolean;
-  setOpen?: any;
+  open: boolean; // notification panel
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const AdminHeader: React.FC<Props> = ({ open, setOpen }) => {

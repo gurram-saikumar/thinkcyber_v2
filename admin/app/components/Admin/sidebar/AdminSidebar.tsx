@@ -18,6 +18,7 @@ import {
   WysiwygIcon,
   ManageHistoryIcon,
   ExitToAppIcon,
+  LayersOutlined,
 } from "./Icon";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -33,12 +34,14 @@ interface itemProps {
   setSelected: any;
 }
 
-const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected }) => {
+
+const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected, }) => {
   const router = useRouter();
   const isActive = selected === title;
 
+
   return (
-    <div 
+    <div
       className="cursor-pointer"
       onClick={() => {
         setSelected(title);
@@ -61,9 +64,13 @@ const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const AdminSidebar = () => {
+interface AdminSidebarProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
   const { user } = useSelector((state: any) => state.auth);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
@@ -71,7 +78,7 @@ const AdminSidebar = () => {
 
   useEffect(() => {
     setMounted(true);
-    
+
     // Set selected based on pathname
     if (pathname === "/admin") {
       setSelected("Dashboard");
@@ -132,20 +139,22 @@ const AdminSidebar = () => {
       className="!bg-white dark:bg-[#111C43]"
     >
       <Sidebar
-        collapsed={isCollapsed}
+        collapsed={!open} 
+        // className="!border-r-0"
         style={{
-          position: "relative", /* Changed to relative since parent is now fixed */
+          // position: "relative",
           height: "100vh",
-          width: isCollapsed ? "0%" : "100%",
+          width: open ? "16vw" : "80px",
+          transition: "all 0.3s ease-in-out",
           backgroundColor: theme === "dark" ? "#111C43" : "white",
-          border: "none",
-          boxShadow: theme === "dark" 
-            ? "0 0 10px rgba(0,0,0,0.5)" 
+          boxShadow:
+          theme === "dark"
+            ? "0 0 10px rgba(0,0,0,0.5)"
             : "0 0 10px rgba(0,0,0,0.1)",
+         
         }}
-        className="!border-r-0"
       >
-        <Menu 
+        <Menu
           menuItemStyles={{
             button: {
               "&:hover": {
@@ -154,39 +163,34 @@ const AdminSidebar = () => {
             },
           }}
         >
-          {/* LOGO AND MENU ICON */}
+          {/* Sidebar Toggle Button */}
           <MenuItem
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            icon={isCollapsed ? <ArrowForwardIosIcon /> : undefined}
-            style={{
-              margin: "30px 0 26px 0", // Increased top margin for better spacing
-            }}
+            onClick={() => setOpen(!open)}
+            icon={
+              open ? (
+                <ArrowBackIosIcon className="text-black dark:text-white" />
+              ) : (
+                <ArrowForwardIosIcon className="text-black dark:text-white" />
+              )
+            }
+            style={{ margin: "30px 0 26px 0" }}
           >
-            {!isCollapsed && (
+            {open && (
               <Box
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
-                ml="15px"
+                ml="10px"
               >
-                <span className="block">
-                  <h3 className="text-[22px] font-bold uppercase dark:text-white text-black">
-                    ThinkCyber
-                  </h3>
-                </span>
-                <IconButton
-                  onClick={() => setIsCollapsed(!isCollapsed)}
-                  className="inline-block hover:bg-gray-100 dark:hover:bg-[#1e2a47]"
-                >
-                  <ArrowBackIosIcon className="text-black dark:text-[#ffffffc1]" />
-                </IconButton>
+                <h3 className="text-[22px] font-bold uppercase dark:text-white text-black">
+                  ThinkCyber
+                </h3>
               </Box>
             )}
           </MenuItem>
 
-          {/* User profile section removed */}
-
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+          {/* Sidebar Content */}
+          <Box paddingLeft={open ? undefined : "10%"}>
             <Item
               title="Dashboard"
               to="/admin"
@@ -200,8 +204,9 @@ const AdminSidebar = () => {
               sx={{ m: "24px 0 10px 25px" }}
               className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
             >
-              {!isCollapsed && "Data"}
+              {open && "Data"}
             </Typography>
+
             <Item
               title="Users"
               to="/admin/users"
@@ -225,8 +230,15 @@ const AdminSidebar = () => {
               className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
               sx={{ m: "24px 0 10px 25px" }}
             >
-              {!isCollapsed && "Content"}
+              {open && "Content"}
             </Typography>
+            <Item
+              title="All Course"
+              to="/admin/all-courses"
+              icon={<LayersOutlined className="text-black dark:text-white" />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Item
               title="Create Course"
               to="/admin/create-course"
@@ -249,7 +261,7 @@ const AdminSidebar = () => {
               className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
               sx={{ m: "24px 0 10px 25px" }}
             >
-              {!isCollapsed && "Customization"}
+              {open && "Customization"}
             </Typography>
             <Item
               title="Hero"
@@ -285,7 +297,7 @@ const AdminSidebar = () => {
               className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
               sx={{ m: "24px 0 10px 25px" }}
             >
-              {!isCollapsed && "Controllers"}
+              {open && "Controllers"}
             </Typography>
             <Item
               title="Manage Team"
@@ -302,7 +314,7 @@ const AdminSidebar = () => {
               className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
               sx={{ m: "24px 0 10px 25px" }}
             >
-              {!isCollapsed && "Analytics"}
+              {open && "Analytics"}
             </Typography>
             <Item
               title="Courses Analytics"
@@ -331,7 +343,6 @@ const AdminSidebar = () => {
               setSelected={setSelected}
             />
 
-         
           </Box>
         </Menu>
       </Sidebar>
