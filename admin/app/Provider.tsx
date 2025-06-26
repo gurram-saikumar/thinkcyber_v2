@@ -1,63 +1,64 @@
 "use client";
-import React, { FC, useEffect, useState } from "react";
-import { Provider } from "react-redux";
+
+import React, { useEffect, useState, FC } from "react";
+import { Provider as ReduxProvider } from "react-redux";
+import { SessionProvider } from "next-auth/react";
+import { ThemeProvider } from "next-themes";
+import socketIO from "socket.io-client";
+import Cookies from "js-cookie";
 import { store } from "../redux/features/store";
+import Loader from "./components/Loader/Loader";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import { useRefreshUserTokenMutation } from "@/redux/features/auth/authApi";
-import Loader from "./components/Loader/Loader";
-import socketIO from "socket.io-client";
-import { SessionProvider } from "next-auth/react";
-import { redirect } from "next/navigation";
-import Cookies from "js-cookie";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
-const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
+const socket = socketIO(ENDPOINT, { transports: ["websocket"] });
 
-interface ProvidersProps {
-  children: any;
+interface Props {
+  children: React.ReactNode;
 }
 
-export function Providers({ children }: ProvidersProps) {
-  return <Provider store={store}>{children}</Provider>;
-}
+export const Providers: FC<Props> = ({ children }) => {
+  return (
+    <ReduxProvider store={store}>
+      <SessionProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthWrapper>{children}</AuthWrapper>
+        </ThemeProvider>
+      </SessionProvider>
+    </ReduxProvider>
+  );
+};
 
-export const Custom: FC<{ children: React.ReactNode }> = ({ children }) => {
+// Handles token refresh and user state loading
+const AuthWrapper: FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading, isError } = useLoadUserQuery({});
   const [refreshToken] = useRefreshUserTokenMutation();
-  const [isMounted, setIsMounted] = useState(false);
-  const [tokenRefreshed, setTokenRefreshed] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Check if we need to refresh the token
   useEffect(() => {
+    // Refresh token logic
     const accessToken = Cookies.get("accessToken");
-    const tokenExists = Cookies.get("refreshToken");
-    
-    // If we have a refresh token but no access token or the access token is invalid
-    if (tokenExists && (!accessToken || isError)) {
-      // Trigger a token refresh
+    const refresh = Cookies.get("refreshToken");
+
+    if (refresh && (!accessToken || isError)) {
       refreshToken({});
-      setTokenRefreshed(true);
     }
   }, [isError, refreshToken]);
 
   useEffect(() => {
-    socketId.on("connection", () => {});
-    setIsMounted(true);
+    socket.on("connect", () => {
+      console.log("Connected to socket:", socket.id);
+    });
+
+    setMounted(true);
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
-  if (!isMounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
-  return (
-    <div>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <div>
-          <SessionProvider>{children}</SessionProvider>
-        </div>
-      )}
-    </div>
-  );
+  return isLoading ? <Loader /> : <>{children}</>;
 };

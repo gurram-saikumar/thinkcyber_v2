@@ -65,11 +65,11 @@ const Item: FC<itemProps> = ({ title, to, icon, selected, setSelected, }) => {
 };
 
 interface AdminSidebarProps {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  Sidebaropen: boolean;
+  SidebarsetOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ Sidebaropen, SidebarsetOpen }) => {
   const { user } = useSelector((state: any) => state.auth);
   const [selected, setSelected] = useState("Dashboard");
   const [mounted, setMounted] = useState(false);
@@ -139,12 +139,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
       className="!bg-white dark:bg-[#111C43]"
     >
       <Sidebar
-        collapsed={!open} 
+        collapsed={!Sidebaropen} 
         // className="!border-r-0"
         style={{
           // position: "relative",
           height: "100vh",
-          width: open ? "16vw" : "80px",
+          width: Sidebaropen ? "16vw" : "80px",
           transition: "all 0.3s ease-in-out",
           backgroundColor: theme === "dark" ? "#111C43" : "white",
           boxShadow:
@@ -165,9 +165,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
         >
           {/* Sidebar Toggle Button */}
           <MenuItem
-            onClick={() => setOpen(!open)}
+            onClick={() => SidebarsetOpen(!Sidebaropen)}
             icon={
-              open ? (
+              Sidebaropen ? (
                 <ArrowBackIosIcon className="text-black dark:text-white" />
               ) : (
                 <ArrowForwardIosIcon className="text-black dark:text-white" />
@@ -175,7 +175,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
             }
             style={{ margin: "30px 0 26px 0" }}
           >
-            {open && (
+            {Sidebaropen && (
               <Box
                 display="flex"
                 justifyContent="space-between"
@@ -190,7 +190,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
           </MenuItem>
 
           {/* Sidebar Content */}
-          <Box paddingLeft={open ? undefined : "10%"}>
+          <Box paddingLeft={Sidebaropen ? undefined : "10%"}>
             <Item
               title="Dashboard"
               to="/admin"
@@ -204,7 +204,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
               sx={{ m: "24px 0 10px 25px" }}
               className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
             >
-              {open && "Data"}
+              {Sidebaropen && "Data"}
             </Typography>
 
             <Item
@@ -230,7 +230,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
               className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
               sx={{ m: "24px 0 10px 25px" }}
             >
-              {open && "Content"}
+              {Sidebaropen && "Content"}
             </Typography>
             <Item
               title="All Course"
@@ -261,7 +261,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
               className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
               sx={{ m: "24px 0 10px 25px" }}
             >
-              {open && "Customization"}
+              {Sidebaropen && "Customization"}
             </Typography>
             <Item
               title="Hero"
@@ -297,7 +297,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
               className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
               sx={{ m: "24px 0 10px 25px" }}
             >
-              {open && "Controllers"}
+              {Sidebaropen && "Controllers"}
             </Typography>
             <Item
               title="Manage Team"
@@ -314,7 +314,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ open, setOpen }) => {
               className="!text-[14px] text-gray-500 dark:text-[#ffffffc1] uppercase !font-semibold tracking-wider"
               sx={{ m: "24px 0 10px 25px" }}
             >
-              {open && "Analytics"}
+              {Sidebaropen && "Analytics"}
             </Typography>
             <Item
               title="Courses Analytics"

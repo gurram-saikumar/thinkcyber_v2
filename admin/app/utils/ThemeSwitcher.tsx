@@ -9,9 +9,7 @@ export const ThemeSwitcher = () => {
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return (
     <div className="flex items-center justify-center mx-4">
