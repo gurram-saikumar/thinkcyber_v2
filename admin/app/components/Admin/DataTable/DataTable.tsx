@@ -108,6 +108,9 @@ export const schema = z.object({
   target: z.string(),
   limit: z.string(),
   reviewer: z.string(),
+  date: z.string(),
+  price: z.number(),
+
 })
 
 // Create a separate component for the drag handle
@@ -164,11 +167,9 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "header",
+    accessorKey: "name",
     header: "Course Name",
-    cell: ({ row }) => {
-      return <TableCellViewer item={row.original} />
-    },
+    cell: ({ row }) => <TableCellViewer item={row.original} />,
     enableHiding: false,
   },
   {
@@ -206,6 +207,11 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     },
   },
   {
+    accessorKey: "date",
+    header: "Added Date",
+    cell: ({ row }) => row.original.date,
+  },
+  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
@@ -218,6 +224,17 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         {row.original.status}
       </Badge>
     ),
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ row }) => row.original.type,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "price",
+    header: "Price",
+    cell: ({ row }) => `$${row.original.price}`,
   },
   {
     id: "actions",
@@ -272,7 +289,7 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
 }
 
 // The Table
-export function DataTable  ({
+export function DataTable({
   data: initialData,
 }: {
   data: z.infer<typeof schema>[]
@@ -347,7 +364,7 @@ export function DataTable  ({
         <Label htmlFor="view-selector" className="sr-only">
           View
         </Label>
-        
+
         {/* Customization Column */}
         <div className="flex items-center justify-items-center gap-2">
           <DropdownMenu>
@@ -391,7 +408,7 @@ export function DataTable  ({
           </Button>
         </div>
       </div>
-      
+
       {/* Main Table data */}
       <TabsContent
         value="outline"
@@ -419,9 +436,9 @@ export function DataTable  ({
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                         </TableHead>
                       )
                     })}
@@ -466,14 +483,14 @@ export function DataTable  ({
               </Label>
               <Select
                 value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value:any) => {
+                onValueChange={(value: any) => {
                   table.setPageSize(Number(value))
                 }}
               >
-                <SelectTrigger 
-                // size="sm" 
-                className="w-20" 
-                id="rows-per-page">
+                <SelectTrigger
+                  // size="sm" 
+                  className="w-20"
+                  id="rows-per-page">
                   <SelectValue
                     placeholder={table.getState().pagination.pageSize}
                   />
@@ -659,3 +676,4 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
     </Drawer>
   )
 }
+

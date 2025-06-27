@@ -185,7 +185,7 @@ const DashboardWidgets: FC<Props> = ({ open }) => {
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md p-4">
+        <div className="rounded-xl shadow-md p-4">
           <HighchartsComponent 
             chartType="area"
             title="User Analytics"
@@ -198,7 +198,7 @@ const DashboardWidgets: FC<Props> = ({ open }) => {
           />
         </div>
         
-        <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md p-4">
+        <div className="rounded-xl shadow-md p-4">
           <HighchartsComponent 
             chartType="column"
             title="Orders Analytics"

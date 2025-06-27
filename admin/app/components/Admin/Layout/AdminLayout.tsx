@@ -14,7 +14,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [Sidebaropen, Sidebarsetopen] = useState(true); // Controls sidebar
 
   return (
-  <div className="flex min-h-screen bg-[#f5f5f9] dark:bg-[#0f172a]">
+  <div className="flex min-h-screen">
   <aside className="fixed top-0 left-0 h-screen z-50">
     <AdminSidebar Sidebaropen={Sidebaropen} SidebarsetOpen={Sidebarsetopen} />
   </aside>
@@ -34,5 +34,3 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 };
 
 export default AdminLayout;
-
-
