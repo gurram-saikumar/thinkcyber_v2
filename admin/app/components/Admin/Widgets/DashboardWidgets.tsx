@@ -226,11 +226,11 @@ const DashboardWidgets: FC<Props> = ({ open }) => {
       {/* Recent Transactions Section */}
       <div className="grid grid-cols-1 mb-8">
         <div className="bg-white dark:bg-[#111C43] rounded-xl shadow-md p-6">
-          <h3 className="text-lg font-semibold mb-4 dark:text-white text-gray-800">
+          <h3 className="text-lg font-semibold mb-4 dark:text-white ">
             Recent Transactions
           </h3>
           <div className="overflow-hidden">
-            <AllInvoices isDashboard={true} />
+            <AllInvoices />
           </div>
         </div>
       </div>
