@@ -10,10 +10,10 @@ const Home = () => {
   return (
     <div className="flex flex-col items-center space-y-7 text-center">
       <Hero />
-      <Companies />
-      <CoursesSection />
-      <TestimonialsSection />
-      <CallToAction />
+      {/* <Companies /> */}
+      {/* <CoursesSection /> */}
+      {/* <TestimonialsSection />
+      <CallToAction /> */}
       <Footer />
     </div>
   );
