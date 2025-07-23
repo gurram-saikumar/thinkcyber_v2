@@ -72,4 +72,16 @@ export const connectDB = async () => {
     }
 };
 
-export { sequelize }; 
+// Test the database connection
+export const testConnection = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('Database connection has been established successfully.');
+        return true;
+    } catch (error: any) {
+        console.error('Unable to connect to the database:', error.message);
+        return false;
+    }
+};
+
+export { sequelize };

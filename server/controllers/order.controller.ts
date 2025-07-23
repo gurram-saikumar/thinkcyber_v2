@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import ErrorHandler from "../utils/ErrorHandler";
 import { Order } from "../models/order.Model";
 import User from "../models/user.model";
-import { Course } from "../models/course.model";
+import Topic from "../models/topic.model";
 import path from "path";
 import ejs from "ejs";
 import sendMail from "../utils/sendMail";
@@ -20,7 +20,7 @@ export const createOrder = catchAsyncError(async (req: Request, res: Response, n
     throw new ErrorHandler("Database connection failed", 500);
   }
 
-  const { courseId, payment_info } = req.body as Order;
+  const { topicId, payment_info } = req.body as Order;
 
   if (payment_info) {
     if ("id" in payment_info) {
@@ -37,33 +37,33 @@ export const createOrder = catchAsyncError(async (req: Request, res: Response, n
 
   const user = await User.findByPk(req.user?.id);
 
-  const courseExistInUser = (user && Array.isArray((user as any).courses))
-    ? (user as any).courses.some((course: any) => course.id === courseId)
+  const topicExistInUser = (user && Array.isArray((user as any).topics))
+    ? (user as any).topics.some((topic: any) => topic.id === topicId)
     : false;
 
-  if (courseExistInUser) {
+  if (topicExistInUser) {
     return next(
-      new ErrorHandler("You have already purchased this course", 400)
+      new ErrorHandler("You have already purchased this topic", 400)
     );
   }
 
-  const course = await Course.findByPk(courseId);
+  const topic = await Topic.findByPk(topicId);
 
-  if (!course) {
-    return next(new ErrorHandler("Course not found", 404));
+  if (!topic) {
+    return next(new ErrorHandler("Topic not found", 404));
   }
 
   const data: any = {
-    courseId: course.id,
+    topicId: topic.id,
     userId: user?.id as string,
     payment_info,
   };
 
   const mailData = {
     order: {
-      _id: course.id.toString().slice(0, 6),
-      name: course.name,
-      price: course.price,
+      _id: topic.id.toString().slice(0, 6),
+      name: topic.name,
+      price: topic.price,
       date: new Date().toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
@@ -90,24 +90,24 @@ export const createOrder = catchAsyncError(async (req: Request, res: Response, n
     return next(new ErrorHandler(error.message, 500));
   }
 
-  if (user && course) {
-    // Ensure user.courses exists and is an array, or update according to your model
-    if (!Array.isArray((user as any).courses)) {
-      (user as any).courses = [];
+  if (user && topic) {
+    // Ensure user.topics exists and is an array, or update according to your model
+    if (!Array.isArray((user as any).topics)) {
+      (user as any).topics = [];
     }
-    (user as any).courses.push(course.id);
+    (user as any).topics.push(topic.id);
     await user.save();
   }
 
   await Notification.create({
     userId: user?.id as string,
     title: "New Order",
-    message: `You have a new order from ${course?.name}`,
+    message: `You have a new order from ${topic?.name}`,
     status: "unread"
   });
 
-  course.purchased = course.purchased + 1;
-  await course.save();
+  topic.purchased = topic.purchased + 1;
+  await topic.save();
 
   await newOrder(data, res, next);
 });
@@ -119,40 +119,40 @@ export const createMobileOrder = catchAsyncError(async (req: Request, res: Respo
     throw new ErrorHandler("Database connection failed", 500);
   }
 
-  const { courseId, payment_info } = req.body as Order;
+  const { topicId, payment_info } = req.body as Order;
   const user = await User.findByPk(req.user?.id);
 
-  let courseExistInUser = false;
+  let topicExistInUser = false;
   if (user) {
-    const userCourses = await (user as any).getCourses?.() || [];
-    courseExistInUser = userCourses.some(
-      (course: any) => course.id === courseId
+    const userTopics = await (user as any).getTopics?.() || [];
+    topicExistInUser = userTopics.some(
+      (topic: any) => topic.id === topicId
     );
   }
 
-  if (courseExistInUser) {
+  if (topicExistInUser) {
     return next(
-      new ErrorHandler("You have already purchased this course", 400)
+      new ErrorHandler("You have already purchased this topic", 400)
     );
   }
 
-  const course = await Course.findByPk(courseId);
+  const topic = await Topic.findByPk(topicId);
 
-  if (!course) {
-    return next(new ErrorHandler("Course not found", 404));
+  if (!topic) {
+    return next(new ErrorHandler("Topic not found", 404));
   }
 
   const data: any = {
-    courseId: course.id,
+    topicId: topic.id,
     userId: user?.id as string,
     payment_info,
   };
 
   const mailData = {
     order: {
-      _id: course.id.toString().slice(0, 6),
-      name: course.name,
-      price: course.price,
+      _id: topic.id.toString().slice(0, 6),
+      name: topic.name,
+      price: topic.price,
       date: new Date().toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
@@ -179,20 +179,20 @@ export const createMobileOrder = catchAsyncError(async (req: Request, res: Respo
     return next(new ErrorHandler(error.message, 500));
   }
 
-  if (user && course) {
-    (user as any).courses.push(course.id);
+  if (user && topic) {
+    (user as any).topics.push(topic.id);
     await user.save();
   }
 
   await Notification.create({
     userId: user?.id as string,
     title: "New Order",
-    message: `You have a new order from ${course?.name}`,
+    message: `You have a new order from ${topic?.name}`,
     status: "unread"
   });
 
-  course.purchased = course.purchased + 1;
-  await course.save();
+  topic.purchased = topic.purchased + 1;
+  await topic.save();
 
   await newOrder(data, res, next);
 });

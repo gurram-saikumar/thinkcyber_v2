@@ -3,73 +3,106 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("dotenv").config();
-const mongoose_1 = __importDefault(require("mongoose"));
+exports.User = void 0;
+const sequelize_1 = require("sequelize");
+const database_1 = require("../utils/database");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const emailRegexPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const userSchema = new mongoose_1.default.Schema({
+// User model class
+class User extends sequelize_1.Model {
+    // Method to compare password
+    async comparePassword(password) {
+        return await bcryptjs_1.default.compare(password, this.password);
+    }
+    SignAccessToken() {
+        return jsonwebtoken_1.default.sign({ id: this.id }, process.env.ACCESS_TOKEN || "", {
+            expiresIn: "5m",
+        });
+    }
+    SignRefreshToken() {
+        return jsonwebtoken_1.default.sign({ id: this.id }, process.env.REFRESH_TOKEN || "", {
+            expiresIn: "3d",
+        });
+    }
+}
+exports.User = User;
+// Initialize User model
+User.init({
+    id: {
+        type: sequelize_1.DataTypes.UUID,
+        defaultValue: sequelize_1.DataTypes.UUIDV4,
+        primaryKey: true,
+    },
     name: {
-        type: String,
-        required: [true, "Please enter your name"],
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
     },
     email: {
-        type: String,
-        required: [true, "Please enter your email"],
-        validate: {
-            validator: function (value) {
-                return emailRegexPattern.test(value);
-            },
-            message: "please enter a valid email",
-        },
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
         unique: true,
+        validate: {
+            isEmail: true,
+        },
     },
     password: {
-        type: String,
-        minlength: [6, "Password must be at least 6 characters"],
-        select: false,
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            len: [6, 100],
+        },
     },
     avatar: {
-        public_id: String,
-        url: String,
+        type: sequelize_1.DataTypes.TEXT,
+        defaultValue: JSON.stringify({
+            public_id: '',
+            url: '',
+        }),
+        get() {
+            const value = this.getDataValue('avatar');
+            return value ? JSON.parse(value) : null;
+        },
+        set(value) {
+            this.setDataValue('avatar', JSON.stringify(value));
+        }
     },
     role: {
-        type: String,
-        default: "user",
+        type: sequelize_1.DataTypes.STRING,
+        defaultValue: 'user',
     },
     isVerified: {
-        type: Boolean,
-        default: false,
+        type: sequelize_1.DataTypes.BOOLEAN,
+        defaultValue: false,
     },
-    courses: [
-        {
-            courseId: String,
+    enrolledCourses: {
+        type: sequelize_1.DataTypes.TEXT,
+        defaultValue: '[]',
+        get() {
+            const value = this.getDataValue('enrolledCourses');
+            return value ? JSON.parse(value) : [];
         },
-    ],
-}, { timestamps: true });
-// Hash Password before saving
-userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) {
-        next();
-    }
-    this.password = await bcryptjs_1.default.hash(this.password, 10);
-    next();
+        set(value) {
+            this.setDataValue('enrolledCourses', JSON.stringify(value));
+        }
+    },
+}, {
+    sequelize: database_1.sequelize,
+    modelName: 'User',
+    timestamps: true,
 });
-// sign access token
-userSchema.methods.SignAccessToken = function () {
-    return jsonwebtoken_1.default.sign({ id: this._id }, process.env.ACCESS_TOKEN || "", {
-        expiresIn: "5m",
-    });
-};
-// sign refresh token
-userSchema.methods.SignRefreshToken = function () {
-    return jsonwebtoken_1.default.sign({ id: this._id }, process.env.REFRESH_TOKEN || "", {
-        expiresIn: "3d",
-    });
-};
-// compare password
-userSchema.methods.comparePassword = async function (enteredPassword) {
-    return await bcryptjs_1.default.compare(enteredPassword, this.password);
-};
-const userModel = mongoose_1.default.model("User", userSchema);
-exports.default = userModel;
+// Hash password before saving
+User.beforeCreate(async (user) => {
+    if (user.password) {
+        const salt = await bcryptjs_1.default.genSalt(10);
+        user.password = await bcryptjs_1.default.hash(user.password, salt);
+    }
+});
+// Hash password before updating
+User.beforeUpdate(async (user) => {
+    if (user.changed('password')) {
+        const salt = await bcryptjs_1.default.genSalt(10);
+        user.password = await bcryptjs_1.default.hash(user.password, salt);
+    }
+});
+exports.default = User;

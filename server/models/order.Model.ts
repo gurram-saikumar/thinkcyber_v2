@@ -1,13 +1,13 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import { sequelize } from '../utils/database';
 import { User } from './user.model';
-import { Course } from './course.model';
+import Topic from './topic.model';
 
 // Order attributes interface
 interface OrderAttributes {
-    id: string;
-    userId: string;
-    courseId: string;
+    id: number;
+    userId: number;
+    topicId: number;
     payment_info: {
         id: string;
         status: string;
@@ -20,9 +20,9 @@ interface OrderCreationAttributes extends Optional<OrderAttributes, 'id'> {}
 
 // Order model class
 export class Order extends Model<OrderAttributes, OrderCreationAttributes> implements OrderAttributes {
-    public id!: string;
-    public userId!: string;
-    public courseId!: string;
+    public id!: number;
+    public userId!: number;
+    public topicId!: number;
     public payment_info!: {
         id: string;
         status: string;
@@ -34,16 +34,16 @@ export class Order extends Model<OrderAttributes, OrderCreationAttributes> imple
 Order.init(
     {
         id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
             primaryKey: true,
         },
         userId: {
-            type: DataTypes.UUID,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
-        courseId: {
-            type: DataTypes.UUID,
+        topicId: {
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         payment_info: {
@@ -51,9 +51,9 @@ Order.init(
             allowNull: false,
             get() {
                 const value = this.getDataValue('payment_info');
-                return value ? JSON.parse(value) : null;
+                return value ? JSON.parse(value) : { id: '', status: '', type: '' };
             },
-            set(value) {
+            set(value: { id: string; status: string; type: string }) {
                 this.setDataValue('payment_info', JSON.stringify(value));
             }
         },
@@ -67,4 +67,4 @@ Order.init(
 
 // Define associations
 Order.belongsTo(User, { foreignKey: 'userId' });
-Order.belongsTo(Course, { foreignKey: 'courseId' });
+Order.belongsTo(Topic, { foreignKey: 'topicId' });

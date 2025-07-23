@@ -3,36 +3,39 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserRoleService = exports.getAllUsersService = exports.getUserById = void 0;
-const redis_1 = require("../utils/redis");
-const user_model_1 = __importDefault(require("../models/user.model"));
+exports.deleteUser = exports.updateUserRole = exports.getAllUsers = exports.getUserById = void 0;
+const user_model_1 = require("../models/user.model");
+const ErrorHandler_1 = __importDefault(require("../utils/ErrorHandler"));
+const catchAsyncError_1 = require("../utils/catchAsyncError");
 // get user by id
-const getUserById = async (id, res) => {
-    const userJson = await redis_1.redis.get(id);
-    if (userJson) {
-        const user = JSON.parse(userJson);
-        res.status(201).json({
-            success: true,
-            user,
-        });
+exports.getUserById = (0, catchAsyncError_1.catchAsyncError)(async (id) => {
+    const user = await user_model_1.User.findByPk(id);
+    if (!user) {
+        throw new ErrorHandler_1.default("User not found", 404);
     }
-};
-exports.getUserById = getUserById;
-// Get All users
-const getAllUsersService = async (res) => {
-    const users = await user_model_1.default.find().sort({ createdAt: -1 });
-    res.status(201).json({
-        success: true,
-        users,
-    });
-};
-exports.getAllUsersService = getAllUsersService;
+    return user;
+});
+// get all users
+exports.getAllUsers = (0, catchAsyncError_1.catchAsyncError)(async () => {
+    const users = await user_model_1.User.findAll();
+    return users;
+});
 // update user role
-const updateUserRoleService = async (res, id, role) => {
-    const user = await user_model_1.default.findByIdAndUpdate(id, { role }, { new: true });
-    res.status(201).json({
-        success: true,
-        user,
-    });
-};
-exports.updateUserRoleService = updateUserRoleService;
+exports.updateUserRole = (0, catchAsyncError_1.catchAsyncError)(async (id, role) => {
+    const user = await user_model_1.User.findByPk(id);
+    if (!user) {
+        throw new ErrorHandler_1.default("User not found", 404);
+    }
+    user.role = role;
+    await user.save();
+    return user;
+});
+// delete user
+exports.deleteUser = (0, catchAsyncError_1.catchAsyncError)(async (id) => {
+    const user = await user_model_1.User.findByPk(id);
+    if (!user) {
+        throw new ErrorHandler_1.default("User not found", 404);
+    }
+    await user.destroy();
+    return { message: "User deleted successfully" };
+});

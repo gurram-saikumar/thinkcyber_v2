@@ -6,17 +6,326 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const user_controller_1 = require("../controllers/user.controller");
 const auth_1 = require("../middleware/auth");
-const userRouter = express_1.default.Router();
-userRouter.post("/registration", user_controller_1.registrationUser);
-userRouter.post("/activate-user", user_controller_1.activateUser);
-userRouter.post("/login", user_controller_1.loginUser);
-userRouter.get("/logout", auth_1.isAutheticated, user_controller_1.logoutUser);
-userRouter.get("/me", auth_1.isAutheticated, user_controller_1.getUserInfo);
-userRouter.post("/social-auth", user_controller_1.socialAuth);
-userRouter.put("/update-user-info", auth_1.isAutheticated, user_controller_1.updateUserInfo);
-userRouter.put("/update-user-password", auth_1.isAutheticated, user_controller_1.updatePassword);
-userRouter.put("/update-user-avatar", auth_1.isAutheticated, user_controller_1.updateProfilePicture);
-userRouter.get("/get-users", auth_1.isAutheticated, (0, auth_1.authorizeRoles)("admin"), user_controller_1.getAllUsers);
-userRouter.put("/update-user", auth_1.isAutheticated, (0, auth_1.authorizeRoles)("admin"), user_controller_1.updateUserRole);
-userRouter.delete("/delete-user/:id", auth_1.isAutheticated, (0, auth_1.authorizeRoles)("admin"), user_controller_1.deleteUser);
-exports.default = userRouter;
+const router = express_1.default.Router();
+/**
+ * @swagger
+ * /api/v1/user/registration:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: Invalid input
+ */
+router.post("/registration", user_controller_1.registerUser);
+/**
+ * @swagger
+ * /api/v1/user/activate-user:
+ *   post:
+ *     summary: Activate a user account
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - activation_token
+ *             properties:
+ *               activation_token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User activated successfully
+ *       400:
+ *         description: Invalid activation token
+ */
+router.post("/activate-user", user_controller_1.activateUser);
+/**
+ * @swagger
+ * /api/v1/user/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: Invalid credentials
+ */
+router.post("/login", user_controller_1.loginUser);
+router.post("/loginEmail", user_controller_1.loginUser);
+/**
+ * @swagger
+ * /api/v1/user/logout:
+ *   get:
+ *     summary: Logout user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ *       401:
+ *         description: Not authenticated
+ */
+router.get("/logout", auth_1.isAuthenticated, user_controller_1.logoutUser);
+/**
+ * @swagger
+ * /api/v1/user/refresh-token:
+ *   get:
+ *     summary: Refresh user token
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *       401:
+ *         description: Not authenticated
+ */
+router.get("/refresh-token", user_controller_1.updateAccessToken);
+/**
+ * @swagger
+ * /api/v1/user/social-auth:
+ *   post:
+ *     summary: Social authentication
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - provider
+ *               - token
+ *             properties:
+ *               provider:
+ *                 type: string
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Social authentication successful
+ *       400:
+ *         description: Invalid provider or token
+ */
+router.post("/social-auth", user_controller_1.socialAuth);
+/**
+ * @swagger
+ * /api/v1/user/me:
+ *   get:
+ *     summary: Get current user info
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User info retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Not authenticated
+ */
+router.get("/me", auth_1.isAuthenticated, user_controller_1.getUserInfo);
+/**
+ * @swagger
+ * /api/v1/user/update-user-info:
+ *   put:
+ *     summary: Update user information
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User info updated successfully
+ *       401:
+ *         description: Not authenticated
+ */
+router.put("/update-user-info", auth_1.isAuthenticated, user_controller_1.updateUserInfo);
+/**
+ * @swagger
+ * /api/v1/user/update-user-password:
+ *   put:
+ *     summary: Update user password
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - oldPassword
+ *               - newPassword
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *       401:
+ *         description: Not authenticated
+ */
+router.put("/update-user-password", auth_1.isAuthenticated, user_controller_1.updateUserPassword);
+/**
+ * @swagger
+ * /api/v1/user/update-avatar:
+ *   put:
+ *     summary: Update user profile picture
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Profile picture updated successfully
+ *       401:
+ *         description: Not authenticated
+ */
+router.put("/update-avatar", auth_1.isAuthenticated, user_controller_1.updateProfilePicture);
+/**
+ * @swagger
+ * /api/v1/user/get-users:
+ *   get:
+ *     summary: Get all users (admin only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of users retrieved successfully
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Not authorized
+ */
+router.get("/get-users", auth_1.isAuthenticated, (0, auth_1.authorizeRoles)("admin"), user_controller_1.getAllUsers);
+/**
+ * @swagger
+ * /api/v1/user/update-user-role:
+ *   put:
+ *     summary: Update user role (admin only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - id
+ *               - role
+ *             properties:
+ *               id:
+ *                 type: integer
+ *               role:
+ *                 type: string
+ *                 enum: [user, admin]
+ *     responses:
+ *       200:
+ *         description: User role updated successfully
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Not authorized
+ */
+router.put("/update-user-role", auth_1.isAuthenticated, (0, auth_1.authorizeRoles)("admin"), user_controller_1.updateUserRole);
+/**
+ * @swagger
+ * /api/v1/user/delete-user/{id}:
+ *   delete:
+ *     summary: Delete a user (admin only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Not authorized
+ */
+router.delete("/delete-user/:id", auth_1.isAuthenticated, (0, auth_1.authorizeRoles)("admin"), user_controller_1.deleteUser);
+exports.default = router;

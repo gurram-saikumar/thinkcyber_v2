@@ -1,14 +1,15 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import { sequelize } from '../utils/database';
 
-// Course attributes interface
-interface CourseAttributes {
-    id: string;
-    userId: string;
+// Topic attributes interface
+interface TopicAttributes {
+    id: number;
+    userId: number;
     name: string;
     description: string;
-    categories: string;
-    subcategories: string;
+    categoryId: number;
+    subcategoryId: number;
+    languageId: string;
     price: number;
     estimatedPrice: string;
     thumbnail: {
@@ -20,8 +21,9 @@ interface CourseAttributes {
     demoUrl: string;
     benefits: Array<{ title: string }>;
     prerequisites: Array<{ title: string }>;
+    status: 'draft' | 'published';
     reviews: Array<{
-        userId: string;
+        userId: number;
         rating: number;
         comment: string;
         user: {
@@ -32,7 +34,7 @@ interface CourseAttributes {
         };
         commentReplies: Array<any>;
     }>;
-    courseData: Array<{
+    topicData: Array<{
         title: string;
         description: string;
         videoUrl: string;
@@ -52,17 +54,18 @@ interface CourseAttributes {
     purchased: number;
 }
 
-// Course creation attributes interface
-interface CourseCreationAttributes extends Optional<CourseAttributes, 'id' | 'ratings' | 'purchased'> {}
+// Topic creation attributes interface
+interface TopicCreationAttributes extends Optional<TopicAttributes, 'id' | 'ratings' | 'purchased'> {}
 
-// Course model class
-export class Course extends Model<CourseAttributes, CourseCreationAttributes> implements CourseAttributes {
-    public id!: string;
-    public userId!: string;
+// Topic model class
+export class Topic extends Model<TopicAttributes, TopicCreationAttributes> implements TopicAttributes {
+    public id!: number;
+    public userId!: number;
     public name!: string;
     public description!: string;
-    public categories!: string;
-    public subcategories!: string;
+    public categoryId!: number;
+    public subcategoryId!: number;
+    public languageId!: string;
     public price!: number;
     public estimatedPrice!: string;
     public thumbnail!: {
@@ -74,8 +77,9 @@ export class Course extends Model<CourseAttributes, CourseCreationAttributes> im
     public demoUrl!: string;
     public benefits!: Array<{ title: string }>;
     public prerequisites!: Array<{ title: string }>;
+    public status!: 'draft' | 'published';
     public reviews!: Array<{
-        userId: string;
+        userId: number;
         rating: number;
         comment: string;
         user: {
@@ -86,7 +90,7 @@ export class Course extends Model<CourseAttributes, CourseCreationAttributes> im
         };
         commentReplies: Array<any>;
     }>;
-    public courseData!: Array<{
+    public topicData!: Array<{
         title: string;
         description: string;
         videoUrl: string;
@@ -106,16 +110,16 @@ export class Course extends Model<CourseAttributes, CourseCreationAttributes> im
     public purchased!: number;
 }
 
-// Initialize Course model
-Course.init(
+// Initialize Topic model
+Topic.init(
     {
         id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
             primaryKey: true,
         },
         userId: {
-            type: DataTypes.UUID,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         name: {
@@ -126,12 +130,16 @@ Course.init(
             type: DataTypes.TEXT,
             allowNull: false,
         },
-        categories: {
-            type: DataTypes.STRING,
+        categoryId: {
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
-        subcategories: {
-            type: DataTypes.STRING,
+        subcategoryId: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        languageId: {
+            type: DataTypes.UUID,
             allowNull: true,
         },
         price: {
@@ -187,6 +195,11 @@ Course.init(
                 this.setDataValue('prerequisites', JSON.stringify(value));
             }
         },
+        status: {
+            type: DataTypes.ENUM('draft', 'published'),
+            defaultValue: 'draft',
+            allowNull: false,
+        },
         reviews: {
             type: DataTypes.TEXT,
             defaultValue: '[]',
@@ -198,15 +211,15 @@ Course.init(
                 this.setDataValue('reviews', JSON.stringify(value));
             }
         },
-        courseData: {
+        topicData: {
             type: DataTypes.TEXT,
             allowNull: false,
             get() {
-                const value = this.getDataValue('courseData');
+                const value = this.getDataValue('topicData');
                 return value ? JSON.parse(value) : [];
             },
             set(value) {
-                this.setDataValue('courseData', JSON.stringify(value));
+                this.setDataValue('topicData', JSON.stringify(value));
             }
         },
         ratings: {
@@ -220,7 +233,9 @@ Course.init(
     },
     {
         sequelize,
-        modelName: 'Course',
+        modelName: 'Topic',
         timestamps: true,
     }
 );
+
+export default Topic;

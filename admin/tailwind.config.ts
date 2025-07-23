@@ -22,6 +22,32 @@ const config: Config = {
   			'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
   			'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'
   		},
+      keyframes: {
+        'fade-in-down': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(-10px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
+        },
+        'fade-out-up': {
+          '0%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'translateY(-10px)'
+          },
+        }
+      },
+      animation: {
+        'fade-in-down': 'fade-in-down 0.3s ease-out',
+        'fade-out-up': 'fade-out-up 0.3s ease-out forwards'
+      },
   		screens: {
   			'1000px': '1000px',
   			'1100px': '1100px',

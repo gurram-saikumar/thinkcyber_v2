@@ -45,8 +45,19 @@ import lesson_icon from './lesson_icon.svg'
 import favorite_icon from './favorite_icon.svg'
 import language_icon from './language_icon.svg'
 import usernew_icon from './user_icon_3.svg'
-
- 
+import BookIcon from './book.svg'
+import PersonIcon from './person.svg'
+import ClockIcon from './clock.svg'
+import bankIcon from './bank.svg'
+import basic_security_icon from './security.svg'
+import business_owner_icon from './businessman.svg'
+import follower_icon from './follower.svg'
+import google_play_icon from './google_play.svg'
+import app_store_icon from './app_store.svg'
+import BasicSecurityImage from './basic-security.png'
+import LoginLogo from './login-logo.svg'
+import Loginbanner from './login-banner.svg'
+  
 export const assets = {
     logo,
     search_icon,
@@ -94,8 +105,19 @@ export const assets = {
     lesson_icon,
     favorite_icon,
     usernew_icon,
-    language_icon
-
+    language_icon,
+    BookIcon,
+    PersonIcon,
+    ClockIcon,
+    bankIcon,
+    basic_security_icon,
+    business_owner_icon,
+    follower_icon,
+    google_play_icon,
+    app_store_icon,
+    BasicSecurityImage,
+    LoginLogo,
+    Loginbanner
 }
 
 export const dummyTestimonial = [

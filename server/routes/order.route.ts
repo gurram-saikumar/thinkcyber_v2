@@ -25,11 +25,11 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - courseId
+ *               - topicId
  *               - payment_info
  *             properties:
- *               courseId:
- *                 type: integer
+ *               topicId:
+ *                 type: string
  *               payment_info:
  *                 type: object
  *     responses:
@@ -55,11 +55,11 @@ router.post("/create-order", isAuthenticated, createOrder);
  *           schema:
  *             type: object
  *             required:
- *               - courseId
+ *               - topicId
  *               - payment_info
  *             properties:
- *               courseId:
- *                 type: integer
+ *               topicId:
+ *                 type: string
  *               payment_info:
  *                 type: object
  *     responses:

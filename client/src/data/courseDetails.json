@@ -1,0 +1,204 @@
+[
+  {
+    "id": "01",
+    "title": "Basic Security",
+    "description": "Basic security principles revolve around protecting information and systems from unauthorized access, use, disclosure, disruption, modification, or destruction.",
+    "rating": "4.5",
+    "students": "212",
+    "author": "Richard James",
+    "structure": [
+      {
+      "section": "Project Introduction",
+      "lectures": "3 lectures",
+      "duration": "45m",
+      "topics": [
+        "App Overview – Build Text-to-Image SaaS",
+        "Tech Stack – React, Node.js, MongoDB",
+        "Core Features – Authentication, payment, deployment"
+      ]
+      },
+      {
+      "section": "Project Setup and configuration",
+      "lectures": "4 lectures",
+      "duration": "45m",
+      "topics": [
+        "Environment Setup – Install Node.js, VS Code",
+        "Repository Setup – Clone project repository",
+        "Install Dependencies – Set up npm packages",
+        "Initial Configuration – Set up basic files and folders"
+      ]
+      },
+      {
+      "section": "Tailwind Setup",
+      "lectures": "4 lectures",
+      "duration": "45m",
+      "topics": [
+        "Install Tailwind CSS",
+        "Configure Tailwind in React project",
+        "Customizing Tailwind theme",
+        "Using Tailwind utility classes"
+      ]
+      },
+      {
+      "section": "Frontend Project",
+      "lectures": "4 lectures",
+      "duration": "45m",
+      "topics": [
+        "Building UI components",
+        "State management with React",
+        "Connecting frontend to backend API",
+        "Implementing authentication in frontend"
+      ]
+      },
+      {
+      "section": "Backend Project",
+      "lectures": "4 lectures",
+      "duration": "45m",
+      "topics": [
+        "Setting up Express server",
+        "Creating RESTful APIs",
+        "Integrating MongoDB database",
+        "Implementing authentication in backend"
+      ]
+      },
+      {
+      "section": "Payment Integration",
+      "lectures": "4 lectures",
+      "duration": "45m",
+      "topics": [
+        "Overview of payment gateways",
+        "Integrating Stripe API",
+        "Handling payment callbacks",
+        "Securing payment transactions"
+      ]
+      },
+      {
+      "section": "Project Deployment",
+      "lectures": "4 lectures",
+      "duration": "45m",
+      "topics": [
+        "Preparing app for production",
+        "Deploying frontend to Vercel/Netlify",
+        "Deploying backend to Render/Heroku",
+        "Environment variables and secrets management"
+      ]
+      }
+    ],
+    "courseDescription": "This is the most comprehensive and in-depth JavaScript course with 30 JavaScript projects. JavaScript is currently the most popular programming language in the world. If you are an aspiring web developer or full stack developer, JavaScript is a must to learn. It also helps you to get high-paying jobs all over the world."
+  },
+  {
+    "id": "02",
+    "title": "Business Owner",
+    "description": "Essential knowledge for business owners to safeguard their operations.",
+    "rating": "4.7",
+    "students": "150",
+    "author": "John Doe",
+    "structure": [
+      {
+      "section": "Risk Management Overview",
+      "lectures": "2 lectures",
+      "duration": "20m",
+      "topics": [
+        "What is Risk Management?",
+        "Importance for Business Owners"
+      ]
+      },
+      {
+      "section": "Identifying Risks",
+      "lectures": "2 lectures",
+      "duration": "20m",
+      "topics": [
+        "Types of Business Risks",
+        "Risk Assessment Techniques"
+      ]
+      },
+      {
+      "section": "Mitigation Strategies",
+      "lectures": "2 lectures",
+      "duration": "20m",
+      "topics": [
+        "Developing a Risk Mitigation Plan",
+        "Implementing Controls"
+      ]
+      },
+      {
+      "section": "Compliance",
+      "lectures": "2 lectures",
+      "duration": "20m",
+      "topics": [
+        "Understanding Legal Requirements",
+        "Maintaining Compliance"
+      ]
+      },
+      {
+      "section": "Case Studies & Best Practices",
+      "lectures": "1 lecture",
+      "duration": "20m",
+      "topics": [
+        "Real-world Examples",
+        "Best Practices for Business Owners"
+      ]
+      }
+    ],
+    "courseDescription": "Learn how to manage risks and ensure compliance as a business owner."
+  },
+  {
+    "id": "03",
+    "title": "Mobile End User",
+    "description": "Guidelines for mobile end users to ensure device and data security.",
+    "rating": "4.8",
+    "students": "300",
+    "author": "Jane Smith",
+    "structure": [
+      {
+      "section": "Mobile Security Basics",
+      "lectures": "3 lectures",
+      "duration": "30m",
+      "topics": [
+        "App Permissions",
+        "Safe Browsing",
+        "Device Encryption"
+      ]
+      },
+      {
+      "section": "Securing Your Device",
+      "lectures": "2 lectures",
+      "duration": "20m",
+      "topics": [
+        "Setting Strong Passwords and Biometrics",
+        "Keeping Your OS and Apps Updated"
+      ]
+      },
+      {
+      "section": "Network Safety",
+      "lectures": "2 lectures",
+      "duration": "20m",
+      "topics": [
+        "Using Secure Wi-Fi",
+        "Avoiding Public Networks",
+        "VPN Usage"
+      ]
+      },
+      {
+      "section": "App and Data Protection",
+      "lectures": "2 lectures",
+      "duration": "20m",
+      "topics": [
+        "Downloading Apps Safely",
+        "Recognizing Malicious Apps",
+        "Backing Up Data"
+      ]
+      },
+      {
+      "section": "Responding to Threats",
+      "lectures": "2 lectures",
+      "duration": "20m",
+      "topics": [
+        "Detecting Phishing Attempts",
+        "What to Do if Your Device is Compromised"
+      ]
+      }
+    ],
+    "courseDescription": "Understand the basics of mobile security and protect your data. This course covers essential practices for keeping your mobile device secure, including safe app usage, network safety, and how to respond to common threats."
+  }
+]

@@ -3,7 +3,7 @@ import { ErrorHandler } from "../utils/ErrorHandler";
 import { catchAsyncError } from "../utils/catchAsyncError";
 import { generateLast12MothsData } from "../utils/analytics.generator";
 import User from "../models/user.model";
-import Course from "../models/course.model";
+import Topic from "../models/topic.model";
 import { Order } from "../models/order.Model";
 import { sequelize } from "../utils/database";
 
@@ -30,11 +30,11 @@ export const getCoursesAnalytics = catchAsyncError(async (req: Request, res: Res
     // Ensure database connection
     await sequelize.authenticate();
 
-    const courses = await generateLast12MothsData(Course);
+    const topics = await generateLast12MothsData(Topic);
 
     res.status(200).json({
       success: true,
-      courses,
+      topics,
     });
   } catch (error: any) {
     return next(new ErrorHandler(error.message, 500));

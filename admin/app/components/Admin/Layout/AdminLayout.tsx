@@ -25,7 +25,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <AdminHeader open={open} setOpen={setOpen} />
     </header>
 
-    <main className="px-4 pt-3">
+    <main className="px-4 pt-3 bg-[#EAEEF5]">
       {children}
     </main>
   </div>

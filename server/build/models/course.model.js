@@ -1,111 +1,124 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importStar(require("mongoose"));
-const reviewSchema = new mongoose_1.Schema({
-    user: Object,
-    rating: {
-        type: Number,
-        default: 0,
+exports.Course = void 0;
+const sequelize_1 = require("sequelize");
+const database_1 = require("../utils/database");
+// Course model class
+class Course extends sequelize_1.Model {
+}
+exports.Course = Course;
+// Initialize Course model
+Course.init({
+    id: {
+        type: sequelize_1.DataTypes.UUID,
+        defaultValue: sequelize_1.DataTypes.UUIDV4,
+        primaryKey: true,
     },
-    comment: String,
-    commentReplies: [Object],
-}, { timestamps: true });
-const linkSchema = new mongoose_1.Schema({
-    title: String,
-    url: String,
-});
-const commentSchema = new mongoose_1.Schema({
-    user: Object,
-    question: String,
-    questionReplies: [Object],
-}, { timestamps: true });
-const courseDataSchema = new mongoose_1.Schema({
-    videoUrl: String,
-    videoThumbnail: Object,
-    title: String,
-    videoSection: String,
-    description: String,
-    videoLength: Number,
-    videoPlayer: String,
-    links: [linkSchema],
-    suggestion: String,
-    questions: [commentSchema],
-});
-const courseSchema = new mongoose_1.Schema({
+    userId: {
+        type: sequelize_1.DataTypes.UUID,
+        allowNull: false,
+    },
     name: {
-        type: String,
-        required: true,
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
     },
     description: {
-        type: String,
-        required: true,
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: false,
     },
     categories: {
-        type: String,
-        required: true,
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+    },
+    subcategories: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true,
     },
     price: {
-        type: Number,
-        required: true,
+        type: sequelize_1.DataTypes.DECIMAL(10, 2),
+        allowNull: false,
     },
     estimatedPrice: {
-        type: Number,
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true,
     },
     thumbnail: {
-        public_id: {
-            type: String,
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: false,
+        get() {
+            const value = this.getDataValue('thumbnail');
+            return value ? JSON.parse(value) : null;
         },
-        url: {
-            type: String,
-        },
+        set(value) {
+            this.setDataValue('thumbnail', JSON.stringify(value));
+        }
     },
     tags: {
-        type: String,
-        required: true,
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
     },
     level: {
-        type: String,
-        required: true,
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
     },
     demoUrl: {
-        type: String,
-        required: true,
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: true,
     },
-    benefits: [{ title: String }],
-    prerequisites: [{ title: String }],
-    reviews: [reviewSchema],
-    courseData: [courseDataSchema],
+    benefits: {
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: false,
+        get() {
+            const value = this.getDataValue('benefits');
+            return value ? JSON.parse(value) : [];
+        },
+        set(value) {
+            this.setDataValue('benefits', JSON.stringify(value));
+        }
+    },
+    prerequisites: {
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: false,
+        get() {
+            const value = this.getDataValue('prerequisites');
+            return value ? JSON.parse(value) : [];
+        },
+        set(value) {
+            this.setDataValue('prerequisites', JSON.stringify(value));
+        }
+    },
+    reviews: {
+        type: sequelize_1.DataTypes.TEXT,
+        defaultValue: '[]',
+        get() {
+            const value = this.getDataValue('reviews');
+            return value ? JSON.parse(value) : [];
+        },
+        set(value) {
+            this.setDataValue('reviews', JSON.stringify(value));
+        }
+    },
+    courseData: {
+        type: sequelize_1.DataTypes.TEXT,
+        allowNull: false,
+        get() {
+            const value = this.getDataValue('courseData');
+            return value ? JSON.parse(value) : [];
+        },
+        set(value) {
+            this.setDataValue('courseData', JSON.stringify(value));
+        }
+    },
     ratings: {
-        type: Number,
-        default: 0,
+        type: sequelize_1.DataTypes.INTEGER,
+        defaultValue: 0,
     },
     purchased: {
-        type: Number,
-        default: 0,
+        type: sequelize_1.DataTypes.INTEGER,
+        defaultValue: 0,
     },
-}, { timestamps: true });
-const CourseModel = mongoose_1.default.model("Course", courseSchema);
-exports.default = CourseModel;
+}, {
+    sequelize: database_1.sequelize,
+    modelName: 'Course',
+    timestamps: true,
+});

@@ -4,7 +4,7 @@ import { Order } from "../models/order.Model";
 import { sequelize } from "../utils/database";
 import { catchAsyncError } from "../utils/catchAsyncError";
 import { User } from "../models/user.model";
-import { Course } from "../models/course.model";
+import Topic from "../models/topic.model";
 
 // create new order
 export const newOrder = catchAsyncError(async (data: any, res: Response, next: NextFunction) => {
@@ -37,7 +37,7 @@ export const getAllOrdersService = catchAsyncError(async (res: Response, next: N
           attributes: ['name', 'email']
         },
         {
-          model: Course,
+          model: Topic,
           attributes: ['name', 'price']
         }
       ]

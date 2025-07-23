@@ -8,6 +8,7 @@ import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import "./Login.css";
+import LogoImg from "../../../public/assests/logo.svg";
 
 type Props = {
   setRoute: (route: string) => void;
@@ -69,8 +70,8 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
       ) : (
         <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-900 shadow-lg rounded-xl p-8 transition-all duration-300">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white font-Poppins">Welcome Back</h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-2 font-Poppins">Sign in to your ThinkCyber account</p>
+            <img src="/assests/logo.svg" alt="ThinkCyber Logo" className="w-60 h-auto mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-300 mt-2 font-Poppins">Welcome to Admin Panel</p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -151,8 +152,7 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
                 "Sign In"
               )}
             </button>
-          </form>
-
+          </form> 
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-300 font-Poppins">
               Don't have an account yet?{" "}
@@ -165,6 +165,10 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
             </p>
           </div>
         </div>
+
+        
+		
+		  
       )}
     </>
   );

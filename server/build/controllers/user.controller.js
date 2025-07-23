@@ -3,123 +3,308 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.updateUserRole = exports.getAllUsers = exports.updateProfilePicture = exports.updatePassword = exports.updateUserInfo = exports.socialAuth = exports.getUserInfo = exports.updateAccessToken = exports.logoutUser = exports.loginUser = exports.activateUser = exports.createActivationToken = exports.registrationUser = void 0;
+exports.socialAuth = exports.updateAccessToken = exports.deleteUser = exports.updateUserRole = exports.getAllUsers = exports.updateProfilePicture = exports.updateUserPassword = exports.updateUserInfo = exports.getUserInfo = exports.logoutUser = exports.loginUser = exports.activateUser = exports.registerUser = void 0;
 require("dotenv").config();
-const user_model_1 = __importDefault(require("../models/user.model"));
+const user_model_1 = require("../models/user.model");
 const ErrorHandler_1 = __importDefault(require("../utils/ErrorHandler"));
-const catchAsyncErrors_1 = require("../middleware/catchAsyncErrors");
+const catchAsyncError_1 = require("../utils/catchAsyncError");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const ejs_1 = __importDefault(require("ejs"));
-const path_1 = __importDefault(require("path"));
 const sendMail_1 = __importDefault(require("../utils/sendMail"));
-const jwt_1 = require("../utils/jwt");
-const redis_1 = require("../utils/redis");
-const user_service_1 = require("../services/user.service");
-const cloudinary_1 = __importDefault(require("cloudinary"));
-exports.registrationUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
+const auth_1 = require("../utils/auth");
+exports.registerUser = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
     try {
-        const { name, email, password } = req.body;
-        const isEmailExist = await user_model_1.default.findOne({ email });
-        if (isEmailExist) {
-            return next(new ErrorHandler_1.default("Email already exist", 400));
+        const { name, email, password, avatar } = req.body;
+        // Validate email format
+        if (!(0, auth_1.validateEmail)(email)) {
+            return next(new ErrorHandler_1.default('Please enter a valid email address', 400));
         }
-        const user = {
+        // Check if user already exists
+        const existingUser = await user_model_1.User.findOne({ where: { email } });
+        if (existingUser) {
+            return next(new ErrorHandler_1.default('Email already exists', 400));
+        }
+        // Create user
+        const user = await user_model_1.User.create({
             name,
             email,
             password,
-        };
-        const activationToken = (0, exports.createActivationToken)(user);
-        const activationCode = activationToken.activationCode;
-        const data = { user: { name: user.name }, activationCode };
-        const html = await ejs_1.default.renderFile(path_1.default.join(__dirname, "../mails/activation-mail.ejs"), data);
+            avatar: avatar || {
+                public_id: 'default_avatar',
+                url: 'https://res.cloudinary.com/demo/image/upload/v1/default_avatar'
+            },
+            role: ""
+        });
+        // Create activation token
+        const activationToken = (0, auth_1.createActivationToken)(user);
+        // Create activation URL
+        const activationUrl = `${process.env.FRONTEND_URL}/activation/${activationToken.token}`;
+        // Send activation email
         try {
             await (0, sendMail_1.default)({
                 email: user.email,
-                subject: "Activate your account",
-                template: "activation-mail.ejs",
-                data,
+                subject: 'Activate your account',
+                template: 'activation-mail.ejs',
+                data: {
+                    user: { name: user.name },
+                    activationCode: activationToken.activationCode,
+                    activationUrl
+                }
             });
             res.status(201).json({
                 success: true,
-                message: `Please check your email: ${user.email} to activate your account!`,
-                activationToken: activationToken.token,
+                message: `Please check your email (${user.email}) to activate your account!`,
+                activationToken: activationToken.token
             });
         }
         catch (error) {
-            return next(new ErrorHandler_1.default(error.message, 400));
+            return next(new ErrorHandler_1.default(error.message, 500));
         }
     }
     catch (error) {
         return next(new ErrorHandler_1.default(error.message, 400));
     }
 });
-const createActivationToken = (user) => {
-    const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
-    const token = jsonwebtoken_1.default.sign({
-        user,
-        activationCode,
-    }, process.env.ACTIVATION_SECRET, {
-        expiresIn: "5m",
-    });
-    return { token, activationCode };
-};
-exports.createActivationToken = createActivationToken;
-exports.activateUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
+exports.activateUser = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
     try {
         const { activation_token, activation_code } = req.body;
-        const newUser = jsonwebtoken_1.default.verify(activation_token, process.env.ACTIVATION_SECRET);
-        if (newUser.activationCode !== activation_code) {
-            return next(new ErrorHandler_1.default("Invalid activation code", 400));
+        const decoded = jsonwebtoken_1.default.verify(activation_token, process.env.ACTIVATION_SECRET);
+        if (!decoded) {
+            return next(new ErrorHandler_1.default('Invalid activation token', 400));
         }
-        const { name, email, password } = newUser.user;
-        const existUser = await user_model_1.default.findOne({ email });
-        if (existUser) {
-            return next(new ErrorHandler_1.default("Email already exist", 400));
+        // Check if activation code matches
+        if (decoded.activationCode !== activation_code) {
+            return next(new ErrorHandler_1.default('Invalid activation code', 400));
         }
-        const user = await user_model_1.default.create({
-            name,
-            email,
-            password,
-        });
+        const { user } = decoded;
+        // Find the user by email
+        const existingUser = await user_model_1.User.findOne({ where: { email: user.email } });
+        if (!existingUser) {
+            return next(new ErrorHandler_1.default('User not found', 400));
+        }
+        // Update user verification status
+        existingUser.isVerified = true;
+        await existingUser.save();
         res.status(201).json({
             success: true,
+            message: 'Account activated successfully'
         });
     }
     catch (error) {
         return next(new ErrorHandler_1.default(error.message, 400));
     }
 });
-exports.loginUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
-    try { 
-        console.log(req.body, "hello")
+exports.loginUser = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
+    try {
         const { email, password } = req.body;
+        console.log('Login attempt for email:', email);
         if (!email || !password) {
-            return next(new ErrorHandler_1.default("Please enter email and password", 400));
+            return next(new ErrorHandler_1.default('Please provide email and password', 400));
         }
-        const user = await user_model_1.default.findOne({ email }).select("+password");
+        const user = await user_model_1.User.findOne({ where: { email } });
+        console.log('User found:', user ? 'Yes' : 'No');
         if (!user) {
-            return next(new ErrorHandler_1.default("Invalid email or password", 400));
+            return next(new ErrorHandler_1.default('Invalid email or password', 400));
         }
-        const isPasswordMatch = await user.comparePassword(password);
-        if (!isPasswordMatch) {
-            return next(new ErrorHandler_1.default("Invalid email or password", 400));
+        // Check if user is verified
+        if (!user.isVerified) {
+            return next(new ErrorHandler_1.default('Please verify your email first', 400));
         }
-        (0, jwt_1.sendToken)(user, 200, res);
+        console.log('Comparing passwords...');
+        const isPasswordValid = await user.comparePassword(password);
+        console.log('Password valid:', isPasswordValid);
+        if (!isPasswordValid) {
+            return next(new ErrorHandler_1.default('Invalid email or password', 400));
+        }
+        const accessToken = (0, auth_1.generateAccessToken)(user);
+        const refreshToken = (0, auth_1.generateRefreshToken)(user);
+        // Set tokens in cookies
+        res.cookie('access_token', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 5 * 60 * 1000 // 5 minutes
+        });
+        res.cookie('refresh_token', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+        // Remove password from user object
+        const userWithoutPassword = {
+            ...user.toJSON(),
+            password: undefined
+        };
+        res.status(200).json({
+            success: true,
+            accessToken,
+            refreshToken,
+            user: userWithoutPassword
+        });
     }
     catch (error) {
+        console.error('Login error:', error);
         return next(new ErrorHandler_1.default(error.message, 400));
     }
 });
 // logout user
-exports.logoutUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
+exports.logoutUser = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
     try {
-        res.cookie("access_token", "", { maxAge: 1 });
-        res.cookie("refresh_token", "", { maxAge: 1 });
-        const userId = req.user?._id || "";
-        redis_1.redis.del(userId);
         res.status(200).json({
             success: true,
-            message: "Logged out successfully",
+            message: 'Logged out successfully'
+        });
+    }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 400));
+    }
+});
+// get user info
+exports.getUserInfo = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return next(new ErrorHandler_1.default('User not found', 404));
+        }
+        const user = await user_model_1.User.findByPk(userId);
+        if (!user) {
+            return next(new ErrorHandler_1.default('User not found', 404));
+        }
+        res.status(200).json({
+            success: true,
+            user
+        });
+    }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 400));
+    }
+});
+exports.updateUserInfo = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
+    try {
+        const { name, email } = req.body;
+        const userId = req.user?.id;
+        if (!userId) {
+            return next(new ErrorHandler_1.default('User not found', 404));
+        }
+        const user = await user_model_1.User.findByPk(userId);
+        if (!user) {
+            return next(new ErrorHandler_1.default('User not found', 404));
+        }
+        if (email && email !== user.email) {
+            const existingUser = await user_model_1.User.findOne({ where: { email } });
+            if (existingUser) {
+                return next(new ErrorHandler_1.default('Email already exists', 400));
+            }
+        }
+        user.name = name || user.name;
+        user.email = email || user.email;
+        await user.save();
+        res.status(200).json({
+            success: true,
+            user
+        });
+    }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 400));
+    }
+});
+exports.updateUserPassword = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        const userId = req.user?.id;
+        if (!userId) {
+            return next(new ErrorHandler_1.default('User not found', 404));
+        }
+        const user = await user_model_1.User.findByPk(userId);
+        if (!user) {
+            return next(new ErrorHandler_1.default('User not found', 404));
+        }
+        const isPasswordValid = await user.comparePassword(oldPassword);
+        if (!isPasswordValid) {
+            return next(new ErrorHandler_1.default('Invalid old password', 400));
+        }
+        user.password = await (0, auth_1.hashPassword)(newPassword);
+        await user.save();
+        res.status(200).json({
+            success: true,
+            message: 'Password updated successfully'
+        });
+    }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 400));
+    }
+});
+exports.updateProfilePicture = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
+    try {
+        const { avatar } = req.body;
+        const userId = req.user?.id;
+        if (!userId) {
+            return next(new ErrorHandler_1.default('User not found', 404));
+        }
+        const user = await user_model_1.User.findByPk(userId);
+        if (!user) {
+            return next(new ErrorHandler_1.default('User not found', 404));
+        }
+        user.avatar = {
+            public_id: `custom_avatar_${user.id}`,
+            url: avatar
+        };
+        await user.save();
+        res.status(200).json({
+            success: true,
+            user
+        });
+    }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 400));
+    }
+});
+// Get all users --- only for admin
+exports.getAllUsers = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
+    try {
+        const users = await user_model_1.User.findAll({
+            attributes: { exclude: ['password'] }
+        });
+        res.status(200).json({
+            success: true,
+            users,
+        });
+    }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 500));
+    }
+});
+// update user role --- only for admin
+exports.updateUserRole = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
+    try {
+        const { id, role } = req.body;
+        const user = await user_model_1.User.findByPk(id);
+        if (!user) {
+            return next(new ErrorHandler_1.default('User not found', 404));
+        }
+        user.role = role;
+        await user.save();
+        res.status(200).json({
+            success: true,
+            user
+        });
+    }
+    catch (error) {
+        return next(new ErrorHandler_1.default(error.message, 400));
+    }
+});
+// delete user --- only for admin
+exports.deleteUser = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const user = await user_model_1.User.findByPk(id);
+        if (!user) {
+            return next(new ErrorHandler_1.default('User not found', 404));
+        }
+        await user.destroy();
+        res.status(200).json({
+            success: true,
+            message: 'User deleted successfully'
         });
     }
     catch (error) {
@@ -127,192 +312,65 @@ exports.logoutUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, ne
     }
 });
 // update access token
-exports.updateAccessToken = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
+exports.updateAccessToken = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
     try {
         const refresh_token = req.cookies.refresh_token;
-        const decoded = jsonwebtoken_1.default.verify(refresh_token, process.env.REFRESH_TOKEN);
-        const message = "Could not refresh token";
+        if (!refresh_token) {
+            return next(new ErrorHandler_1.default('Please login to access this resource', 401));
+        }
+        const decoded = jsonwebtoken_1.default.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET || 'your-refresh-token-secret');
         if (!decoded) {
-            return next(new ErrorHandler_1.default(message, 400));
+            return next(new ErrorHandler_1.default('Invalid refresh token', 401));
         }
-        const session = await redis_1.redis.get(decoded.id);
-        if (!session) {
-            return next(new ErrorHandler_1.default("Please login for access this resources!", 400));
+        const user = await user_model_1.User.findByPk(decoded.id);
+        if (!user) {
+            return next(new ErrorHandler_1.default('User not found', 404));
         }
-        const user = JSON.parse(session);
-        const accessToken = jsonwebtoken_1.default.sign({ id: user._id }, process.env.ACCESS_TOKEN, {
-            expiresIn: "5m",
+        const accessToken = (0, auth_1.generateAccessToken)(user);
+        res.status(200).json({
+            success: true,
+            accessToken
         });
-        const refreshToken = jsonwebtoken_1.default.sign({ id: user._id }, process.env.REFRESH_TOKEN, {
-            expiresIn: "3d",
-        });
-        req.user = user;
-        res.cookie("access_token", accessToken, jwt_1.accessTokenOptions);
-        res.cookie("refresh_token", refreshToken, jwt_1.refreshTokenOptions);
-        await redis_1.redis.set(user._id, JSON.stringify(user), "EX", 604800); // 7days
-        return next();
     }
     catch (error) {
         return next(new ErrorHandler_1.default(error.message, 400));
     }
 });
-// get user info
-exports.getUserInfo = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
-    try {
-        const userId = req.user?._id;
-        (0, user_service_1.getUserById)(userId, res);
-    }
-    catch (error) {
-        return next(new ErrorHandler_1.default(error.message, 400));
-    }
-});
-// social auth
-exports.socialAuth = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
+exports.socialAuth = (0, catchAsyncError_1.catchAsyncError)(async (req, res, next) => {
     try {
         const { email, name, avatar } = req.body;
-        const user = await user_model_1.default.findOne({ email });
+        const user = await user_model_1.User.findOne({ where: { email } });
         if (!user) {
-            const newUser = await user_model_1.default.create({ email, name, avatar });
-            (0, jwt_1.sendToken)(newUser, 200, res);
-        }
-        else {
-            (0, jwt_1.sendToken)(user, 200, res);
-        }
-    }
-    catch (error) {
-        return next(new ErrorHandler_1.default(error.message, 400));
-    }
-});
-exports.updateUserInfo = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
-    try {
-        const { name } = req.body;
-        const userId = req.user?._id;
-        const user = await user_model_1.default.findById(userId);
-        if (name && user) {
-            user.name = name;
-        }
-        await user?.save();
-        await redis_1.redis.set(userId, JSON.stringify(user));
-        res.status(201).json({
-            success: true,
-            user,
-        });
-    }
-    catch (error) {
-        return next(new ErrorHandler_1.default(error.message, 400));
-    }
-});
-exports.updatePassword = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
-    try {
-        const { oldPassword, newPassword } = req.body;
-        if (!oldPassword || !newPassword) {
-            return next(new ErrorHandler_1.default("Please enter old and new password", 400));
-        }
-        const user = await user_model_1.default.findById(req.user?._id).select("+password");
-        if (user?.password === undefined) {
-            return next(new ErrorHandler_1.default("Invalid user", 400));
-        }
-        const isPasswordMatch = await user?.comparePassword(oldPassword);
-        if (!isPasswordMatch) {
-            return next(new ErrorHandler_1.default("Invalid old password", 400));
-        }
-        user.password = newPassword;
-        await user.save();
-        await redis_1.redis.set(req.user?._id, JSON.stringify(user));
-        res.status(201).json({
-            success: true,
-            user,
-        });
-    }
-    catch (error) {
-        return next(new ErrorHandler_1.default(error.message, 400));
-    }
-});
-// update profile picture
-exports.updateProfilePicture = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
-    try {
-        const { avatar } = req.body;
-        const userId = req.user?._id;
-        const user = await user_model_1.default.findById(userId).select("+password");
-        if (avatar && user) {
-            // if user have one avatar then call this if
-            if (user?.avatar?.public_id) {
-                // first delete the old image
-                await cloudinary_1.default.v2.uploader.destroy(user?.avatar?.public_id);
-                const myCloud = await cloudinary_1.default.v2.uploader.upload(avatar, {
-                    folder: "avatars",
-                    width: 150,
-                });
-                user.avatar = {
-                    public_id: myCloud.public_id,
-                    url: myCloud.secure_url,
-                };
-            }
-            else {
-                const myCloud = await cloudinary_1.default.v2.uploader.upload(avatar, {
-                    folder: "avatars",
-                    width: 150,
-                });
-                user.avatar = {
-                    public_id: myCloud.public_id,
-                    url: myCloud.secure_url,
-                };
-            }
-        }
-        await user?.save();
-        await redis_1.redis.set(userId, JSON.stringify(user));
-        res.status(200).json({
-            success: true,
-            user,
-        });
-    }
-    catch (error) {
-        return next(new ErrorHandler_1.default(error.message, 400));
-    }
-});
-// get all users --- only for admin
-exports.getAllUsers = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
-    try {
-        (0, user_service_1.getAllUsersService)(res);
-    }
-    catch (error) {
-        return next(new ErrorHandler_1.default(error.message, 400));
-    }
-});
-// update user role --- only for admin
-exports.updateUserRole = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
-    try {
-        const { email, role } = req.body;
-        const isUserExist = await user_model_1.default.findOne({ email });
-        if (isUserExist) {
-            const id = isUserExist._id;
-            (0, user_service_1.updateUserRoleService)(res, id, role);
-        }
-        else {
-            res.status(400).json({
-                success: false,
-                message: "User not found",
+            const newUser = await user_model_1.User.create({
+                email,
+                name,
+                avatar: {
+                    public_id: `social_avatar_${email}`,
+                    url: avatar
+                },
+                isVerified: true,
+                password: "",
+                role: ""
+            });
+            const accessToken = (0, auth_1.generateAccessToken)(newUser);
+            const refreshToken = (0, auth_1.generateRefreshToken)(newUser);
+            res.status(201).json({
+                success: true,
+                accessToken,
+                refreshToken,
+                user: newUser
             });
         }
-    }
-    catch (error) {
-        return next(new ErrorHandler_1.default(error.message, 400));
-    }
-});
-// Delete user --- only for admin
-exports.deleteUser = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const user = await user_model_1.default.findById(id);
-        if (!user) {
-            return next(new ErrorHandler_1.default("User not found", 404));
+        else {
+            const accessToken = (0, auth_1.generateAccessToken)(user);
+            const refreshToken = (0, auth_1.generateRefreshToken)(user);
+            res.status(200).json({
+                success: true,
+                accessToken,
+                refreshToken,
+                user
+            });
         }
-        await user.deleteOne({ id });
-        await redis_1.redis.del(id);
-        res.status(200).json({
-            success: true,
-            message: "User deleted successfully",
-        });
     }
     catch (error) {
         return next(new ErrorHandler_1.default(error.message, 400));

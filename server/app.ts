@@ -4,11 +4,13 @@ import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
 import { ErrorMiddleware } from './middleware/error';
 import userRouter from './routes/user.route';
-import courseRouter from './routes/course.route';
+import topicRouter from './routes/topic.route';
+import categoryRouter from './routes/category.route';
+import subcategoryRouter from './routes/subcategory.route';
+import languageRouter from './routes/language.route';
 import orderRouter from './routes/order.route';
 import notificationRouter from './routes/notification.route';
 import analyticsRouter from './routes/analytics.route';
-import layoutRouter from './routes/layout.route';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import { createServer } from 'http';
@@ -81,11 +83,13 @@ app.use(limiter);
 
 // Routes
 app.use('/api/v1', userRouter);
-app.use('/api/v1', courseRouter);
+app.use('/api/v1', topicRouter);
+app.use('/api/v1', categoryRouter);
+app.use('/api/v1', subcategoryRouter);
+app.use('/api/v1', languageRouter);
 app.use('/api/v1/order', orderRouter);
 app.use('/api/v1', notificationRouter);
 app.use('/api/v1', analyticsRouter);
-app.use('/api/v1', layoutRouter);
 
 // Mount Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));

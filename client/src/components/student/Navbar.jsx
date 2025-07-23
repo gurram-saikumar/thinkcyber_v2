@@ -4,10 +4,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { AppContext } from '../../context/AppContext';
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react';
 import { toast } from 'react-toastify';
+import LoginModal from './LoginModal';
 
 const Navbar = () => {
-
   const location = useLocation(); 
+  const [showLogin, setShowLogin] = React.useState(false);
 
   return (
     <div className="flex items-center justify-between px-4 sm:px-10 md:px-10 lg:px-24 border-b border-gray-300 py-4 bg-white">
@@ -43,7 +44,7 @@ const Navbar = () => {
         <button>
           <img src={assets.language_icon} alt="Language" className="w-12 h-12" />
         </button>
-         <button>
+         <button onClick={() => setShowLogin(true)}>
           <img src={assets.usernew_icon} alt="User" className="w-12 h-12" />
         </button>
         <div className='md:flex hidden items-center gap-5 text-gray-500'>
@@ -65,6 +66,7 @@ const Navbar = () => {
        
         </div>
       </div>
+      <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
     </div>
   );
 };

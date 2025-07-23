@@ -7,17 +7,17 @@ const emailRegexPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // User attributes interface
 interface UserAttributes {
-    id: string;
-  name: string;
-  email: string;
-  password: string;
+    id: number;
+    name: string;
+    email: string;
+    password: string;
     avatar?: {
-    public_id: string;
-    url: string;
-  };
-  role: string;
-  isVerified: boolean;
-    enrolledCourses: Array<{ courseId: string }>;
+        public_id: string;
+        url: string;
+    };
+    role: string;
+    isVerified: boolean;
+    enrolledCourses: Array<{ courseId: number }>;
 }
 
 // User creation attributes interface
@@ -25,7 +25,7 @@ interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'avatar
 
 // User model class
 export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-    public id!: string;
+    public id!: number;
     public name!: string;
     public email!: string;
     public password!: string;
@@ -35,7 +35,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
     };
     public role!: string;
     public isVerified!: boolean;
-    public enrolledCourses!: Array<{ courseId: string }>;
+    public enrolledCourses!: Array<{ courseId: number }>;
 
     // Method to compare password
     public async comparePassword(password: string): Promise<boolean> {
@@ -59,8 +59,8 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
 User.init(
     {
         id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
             primaryKey: true,
         },
     name: {

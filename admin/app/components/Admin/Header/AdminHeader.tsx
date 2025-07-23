@@ -87,20 +87,20 @@ const AdminHeader: React.FC<Props> = ({ open, setOpen }) => {
     window.location.reload();
   };
   return (
-  <div className="w-full flex items-center justify-between p-6 bg-white/95 dark:bg-[#111C43]/95 backdrop-blur-sm shadow-sm">
+  <div className="w-full flex items-center justify-between p-6 bg-[#F5F7F9] dark:bg-[#111C43]/95 backdrop-blur-sm shadow-sm">
     <h1 className="text-2xl font-bold text-black dark:text-white hidden md:block">Dashboard</h1>
     
     <div className="flex items-center gap-4">
       <ThemeSwitcher />
 
-      <div className="relative cursor-pointer" onClick={() => setOpen(!open)}>
+      {/* <div className="relative cursor-pointer" onClick={() => setOpen(!open)}>
         <IoMdNotificationsOutline className="text-2xl cursor-pointer dark:text-white text-black" />
         {notifications && notifications.length > 0 && (
           <span className="absolute -top-2 -right-2 bg-[#3ccba0] rounded-full w-[20px] h-[20px] text-[12px]    flex items-center justify-center text-white">
             {notifications.length}
           </span>
         )}
-      </div>
+      </div> */}
       
       <div className="relative" ref={userMenuRef}>
         <div
@@ -109,7 +109,7 @@ const AdminHeader: React.FC<Props> = ({ open, setOpen }) => {
         >
           {user?.avatar ? (
             <img
-              src={user.avatar.url}
+              src='./assests/avatar.svg'
               alt={user.name}
               className="w-9 h-9 rounded-full object-cover border-2 border-[#3ccba0]"
             />

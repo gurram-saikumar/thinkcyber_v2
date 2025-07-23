@@ -7,7 +7,7 @@ interface NotificationAttributes {
   title: string;
   message: string;
   status: string;
-  userId: string; // changed from number to string for UUID
+  userId: number; // Changed from string to number for INTEGER
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -23,7 +23,7 @@ class Notification
   public title!: string;
   public message!: string;
   public status!: string;
-  public userId!: string; // changed from number to string for UUID
+  public userId!: number; // Changed from string to number for INTEGER
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -49,7 +49,7 @@ Notification.init(
       defaultValue: "unread",
     },
     userId: {
-      type: DataTypes.UUID,
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: User,
